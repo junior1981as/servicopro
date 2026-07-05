@@ -1,0 +1,59 @@
+# Sistema / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.vs/
+.idea/
+
+# Frontend / Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+dist/
+build/
+
+# Backend / .NET
+bin/
+obj/
+backend/bin/
+backend/obj/
+backend/publish/
+**/publish/
+*.user
+*.suo
+
+# Logs / temporarios
+logs/
+*.log
+tmp/
+temp/
+
+# Segredos / ambiente
+.env
+.env.*
+!.env.example
+segredos/
+appsettings.Production.json
+**/appsettings.Production.json
+
+# Banco / runtime / dados locais
+dados/
+sqlserver/
+runtime/
+
+# Backups / pacotes
+*.bak
+*.backup
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# Certificados / chaves
+*.pfx
+*.pem
+*.key
+*.crt
+*.cer

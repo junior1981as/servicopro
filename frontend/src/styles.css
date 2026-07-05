@@ -1,0 +1,2989 @@
+:root {
+  --bg:#07090f;
+  --bg2:#0b0e1a;
+  --bg3:#0f1322;
+  --s1:rgba(255,255,255,.04);
+  --s2:rgba(255,255,255,.07);
+  --s3:rgba(255,255,255,.11);
+  --b1:rgba(255,255,255,.08);
+  --b2:rgba(255,255,255,.15);
+  --t1:#eef0f8;
+  --t2:#8d95b4;
+  --t3:#4e5674;
+  --ac:#4f7cff;
+  --gr:#22d3a0;
+  --am:#f59e42;
+  --re:#f05a5a;
+  --pu:#a78bfa;
+  --cy:#22d3ee;
+  --r:18px;
+  --rsm:11px;
+  --rlg:26px;
+  --sw:268px;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--t1);
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.login {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  background:
+    radial-gradient(ellipse 90% 70% at 15% 15%, rgba(79,124,255,.16), transparent 55%),
+    radial-gradient(ellipse 55% 55% at 85% 80%, rgba(34,211,160,.1), transparent 55%),
+    var(--bg);
+}
+
+.lLeft {
+  position: relative;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.brand,
+.sbrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+
+.brand {
+  font-size: 19px;
+}
+
+.bmark {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #4f7cff, #22d3a0);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  box-shadow: 0 6px 28px rgba(79,124,255,.38);
+}
+
+.lhero h1 {
+  font-size: clamp(28px, 3vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+  margin: 0 0 18px;
+}
+
+.lhero p {
+  max-width: 560px;
+  color: var(--t2);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.chip {
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--b2);
+  background: var(--s1);
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lfloat {
+  max-width: 340px;
+  padding: 16px;
+  border: 1px solid var(--b2);
+  background: rgba(255,255,255,.04);
+  border-radius: var(--r);
+  backdrop-filter: blur(16px);
+}
+
+.lfloat strong {
+  display: block;
+  margin-bottom: 7px;
+}
+
+.mbar {
+  height: 5px;
+  background: var(--s3);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 10px 0 5px;
+}
+
+.mbar span {
+  display: block;
+  height: 100%;
+  width: 76%;
+  background: linear-gradient(90deg,#4f7cff,#22d3a0);
+}
+
+.lRight {
+  display: grid;
+  place-items: center;
+  padding: 36px;
+  border-left: 1px solid var(--b1);
+  background: rgba(255,255,255,.015);
+}
+
+.lpanel {
+  width: min(420px, 100%);
+  padding: 26px;
+  border: 1px solid var(--b1);
+  background: rgba(255,255,255,.04);
+  border-radius: var(--rlg);
+  box-shadow: 0 30px 100px rgba(0,0,0,.35);
+}
+
+.lpanel h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  letter-spacing: -.04em;
+}
+
+.sub {
+  color: var(--t2);
+  margin: 0 0 24px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.lbl {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--t3);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.inp {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  border-radius: var(--rsm);
+  color: var(--t1);
+  outline: none;
+}
+
+.inp:focus {
+  border-color: rgba(79,124,255,.55);
+  box-shadow: 0 0 0 3px rgba(79,124,255,.12);
+}
+
+.btnMain {
+  width: 100%;
+  padding: 13px;
+  border: 0;
+  border-radius: var(--rsm);
+  background: linear-gradient(135deg,#4f7cff,#3b63e8);
+  color: white;
+  font-weight: 800;
+  box-shadow: 0 8px 32px rgba(79,124,255,.28);
+}
+
+.lnote {
+  color: var(--t3);
+  font-size: 11px;
+  text-align: center;
+  margin-top: 14px;
+}
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--sw) 1fr;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg2);
+  border-right: 1px solid var(--b1);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 14px 14px;
+}
+
+.sbrand {
+  padding: 0 4px 16px;
+}
+
+.tenant-b,
+.side-chart,
+.card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--r);
+}
+
+.tenant-b {
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.t-lbl {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.t-name {
+  font-weight: 800;
+  margin: 3px 0 7px;
+}
+
+.t-db {
+  display: inline-flex;
+  background: rgba(79,124,255,.13);
+  color: #7fa9ff;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.side-chart {
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.side-chart-head,
+.chart-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.side-chart-head span,
+.chart-stat span {
+  color: var(--t2);
+  font-size: 11px;
+}
+
+.side-chart-head strong,
+.chart-stat strong {
+  color: var(--gr);
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+  margin-top: 10px;
+}
+
+.bar {
+  flex: 1;
+  min-height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: var(--s3);
+}
+
+.bar.today {
+  background: linear-gradient(180deg,#4f7cff,#3b63e8);
+}
+
+.bar.high {
+  background: rgba(34,211,160,.35);
+}
+
+.chart-days {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.chart-days span {
+  flex: 1;
+  text-align: center;
+  color: var(--t3);
+  font-size: 9px;
+}
+
+.ng-lbl {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  padding: 9px 8px 4px;
+}
+
+.nb {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--t2);
+  font-weight: 600;
+  text-align: left;
+}
+
+.nb:hover,
+.nb.active {
+  background: rgba(79,124,255,.14);
+  color: #9cb8ff;
+}
+
+.ni {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--s2);
+  display: grid;
+  place-items: center;
+}
+
+.sfooter {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--b1);
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.user-av,
+.tav {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#4f7cff,#22d3a0);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 900;
+}
+
+.user-info strong,
+.user-info span {
+  display: block;
+}
+
+.user-info span {
+  color: var(--t3);
+  font-size: 11px;
+}
+
+.btn-logout {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid rgba(240,90,90,.25);
+  background: rgba(240,90,90,.11);
+  color: #ff9b9b;
+  border-radius: 10px;
+  text-align: left;
+  font-weight: 700;
+}
+
+.workspace {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 13px 24px;
+  border-bottom: 1px solid var(--b1);
+  background: rgba(7,9,15,.88);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sw {
+  flex: 1;
+  max-width: 520px;
+  position: relative;
+}
+
+.si {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--t3);
+}
+
+.sinp {
+  width: 100%;
+  padding: 10px 12px 10px 34px;
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: 10px;
+  color: var(--t1);
+  outline: none;
+}
+
+.tr {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border-radius: 9px;
+  border: 1px solid var(--b1);
+  font-weight: 800;
+  background: var(--s1);
+  color: var(--t2);
+}
+
+.bp,
+.ba {
+  background: rgba(79,124,255,.14);
+  color: #9cb8ff;
+  border-color: rgba(79,124,255,.24);
+}
+
+.bd {
+  background: rgba(240,90,90,.14);
+  color: #ff9b9b;
+  border-color: rgba(240,90,90,.25);
+}
+
+.bsm {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.content {
+  padding: 22px 26px;
+}
+
+.sh {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.ey {
+  color: var(--ac);
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.sh h2 {
+  margin: 5px 0 4px;
+  font-size: 22px;
+  letter-spacing: -.035em;
+}
+
+.sh p,
+.ct p,
+.ti p {
+  color: var(--t2);
+}
+
+.g {
+  display: grid;
+  gap: 14px;
+}
+
+.g-dash,
+.g4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.gw {
+  grid-template-columns: 1.55fr 1fr;
+}
+
+.dash-col {
+  display: grid;
+  gap: 14px;
+}
+
+.card {
+  padding: 16px;
+}
+
+.ct {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ct h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.mc {
+  position: relative;
+  overflow: hidden;
+}
+
+.mc-ico {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(79,124,255,.15);
+  margin-bottom: 8px;
+}
+
+.mc-val {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -.05em;
+}
+
+.mc-lbl {
+  color: var(--t2);
+  font-size: 12px;
+}
+
+.mc-bar {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--s3);
+  overflow: hidden;
+  margin: 7px 0;
+}
+
+.mc-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg,#4f7cff,#22d3a0);
+}
+
+.mc-hint {
+  font-size: 11px;
+  color: #7fa9ff;
+  font-weight: 800;
+}
+
+.tl {
+  display: grid;
+  gap: 11px;
+}
+
+.ti {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+}
+
+.td {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: rgba(79,124,255,.13);
+  color: #9cb8ff;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+}
+
+.fs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--b1);
+  border-radius: var(--rsm);
+  overflow: hidden;
+}
+
+.fb {
+  padding: 10px 12px;
+  border-right: 1px solid var(--b1);
+}
+
+.fb:last-child {
+  border-right: 0;
+}
+
+.fb-n {
+  color: var(--t3);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.fb strong {
+  display: block;
+  margin: 3px 0;
+}
+
+.fb span {
+  color: var(--t3);
+  font-size: 11px;
+}
+
+.fb.on {
+  background: rgba(79,124,255,.11);
+}
+
+.ins {
+  border-left: 3px solid var(--ac);
+  background: rgba(79,124,255,.08);
+  border-radius: 0 var(--rsm) var(--rsm) 0;
+  padding: 12px 14px;
+  color: var(--t2);
+}
+
+.ins.am {
+  border-color: var(--am);
+  background: rgba(245,158,66,.12);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.bg-g {
+  background: rgba(34,211,160,.14);
+  color: var(--gr);
+}
+
+.bg-b {
+  background: rgba(79,124,255,.14);
+  color: #9cb8ff;
+}
+
+.tw {
+  overflow: auto;
+  border: 1px solid var(--b1);
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--b1);
+}
+
+th {
+  color: var(--t3);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+td {
+  color: var(--t2);
+}
+
+@media (max-width: 1080px) {
+  .login,
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .lLeft {
+    display: none;
+  }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+
+  .g-dash,
+  .g4,
+  .gw {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Operação.1 v2 - Correcao global de contraste dos selects/dropdowns
+   Mantem o tema escuro também nas opções abertas do select nativo. */
+select,
+select.inp {
+  color: #eef0f8 !important;
+  background-color: #1f2937 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color-scheme: dark !important;
+}
+
+select option,
+select.inp option {
+  color: #eef0f8 !important;
+  background-color: #111827 !important;
+}
+
+select option:checked,
+select.inp option:checked {
+  color: #ffffff !important;
+  background-color: #2563eb !important;
+}
+
+select:focus,
+select.inp:focus {
+  color: #ffffff !important;
+  background-color: #1f2937 !important;
+}
+
+
+/* Orcamentos - layout compacto e resumo visual */
+.orc-resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.orc-resumo-card {
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.orc-resumo-card span {
+  color: var(--t3);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.orc-resumo-card strong {
+  color: var(--t1);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -.03em;
+}
+
+.orc-resumo-card-total {
+  background: rgba(79,124,255,.13);
+  border-color: rgba(79,124,255,.28);
+}
+
+.orc-resumo-card-total strong {
+  color: #9cb8ff;
+}
+
+.orc-painel-itens {
+  display: grid;
+  grid-template-columns: minmax(340px, .9fr) minmax(520px, 1.1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.orc-card-adicionar .field {
+  margin-bottom: 10px;
+}
+
+.orc-card-adicionar .fg {
+  display: grid;
+  grid-template-columns: .75fr 1fr;
+  gap: 10px;
+}
+
+.orc-card-adicionar .inp {
+  min-height: 40px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.orc-card-adicionar .ct {
+  margin-bottom: 10px;
+}
+
+.orc-card-adicionar .ct p {
+  margin-top: 2px;
+}
+
+.orc-card-lista-itens {
+  min-width: 0;
+}
+
+.orc-card-lista-itens .tw {
+  max-height: 360px;
+  overflow: auto;
+}
+
+@media (max-width: 1200px) {
+  .orc-painel-itens {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .orc-resumo-grid {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
+
+  .orc-card-adicionar .fg {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .orc-resumo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Orcamentos - contexto de cliente e ativo */
+.orc-contexto-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.orc-contexto-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 13px 14px;
+  min-width: 0;
+}
+
+.orc-contexto-titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 10px;
+}
+
+.orc-contexto-titulo span {
+  color: var(--t3);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.orc-contexto-titulo strong {
+  color: var(--t1);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orc-contexto-linhas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.orc-contexto-linha {
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-width: 0;
+}
+
+.orc-contexto-linha span {
+  display: block;
+  color: var(--t3);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 3px;
+}
+
+.orc-contexto-linha strong {
+  display: block;
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .orc-contexto-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .orc-contexto-linhas {
+    grid-template-columns: 1fr;
+  }
+
+  .orc-contexto-titulo strong,
+  .orc-contexto-linha strong {
+    white-space: normal;
+  }
+}
+
+
+/* Orcamentos - itens sempre visiveis */
+.orc-itens-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.orc-itens-header h3 {
+  margin: 0 0 3px;
+  color: var(--t1);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+
+.orc-itens-header p {
+  margin: 0;
+  color: var(--t2);
+  font-size: 12px;
+}
+
+.orc-itens-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.orc-itens-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.orc-itens-grid .card {
+  margin: 0;
+}
+
+.orc-itens-grid .ct {
+  margin-bottom: 10px;
+}
+
+.orc-itens-grid .ct h3 {
+  margin: 0;
+}
+
+.orc-itens-grid .ct p {
+  margin-top: 3px;
+}
+
+.orc-itens-grid .tw {
+  max-height: 330px;
+  overflow: auto;
+}
+
+.orc-itens-grid table th,
+.orc-itens-grid table td {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.orc-form-compacto {
+  display: grid;
+  grid-template-columns: minmax(260px, .9fr) minmax(320px, 1.1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.orc-form-valores {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: .75fr 1fr 1fr;
+  gap: 12px;
+}
+
+.orc-form-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+@media (max-width: 1200px) {
+  .orc-itens-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .orc-form-compacto,
+  .orc-form-valores {
+    grid-template-columns: 1fr;
+  }
+
+  .orc-form-valores {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .orc-itens-header {
+    flex-direction: column;
+  }
+
+  .orc-itens-acoes {
+    justify-content: flex-start;
+  }
+}
+
+
+/* Orcamentos - desconto por item */
+.orc-form-valores-desconto {
+  grid-template-columns: .65fr .95fr .95fr .75fr .95fr .95fr;
+}
+
+.orc-form-valores-desconto input[readonly] {
+  opacity: .85;
+  cursor: not-allowed;
+}
+
+.orc-itens-grid table th:nth-child(5),
+.orc-itens-grid table td:nth-child(5),
+.orc-itens-grid table th:nth-child(6),
+.orc-itens-grid table td:nth-child(6) {
+  white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+  .orc-form-valores-desconto {
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .orc-form-valores-desconto {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Orcamentos - modal de inclusao de servico/produto */
+.orc-card-adicionar {
+  position: fixed !important;
+  z-index: 80;
+  left: 50%;
+  top: 50%;
+  width: min(980px, calc(100vw - 32px));
+  max-height: min(82vh, 760px);
+  overflow: auto;
+  transform: translate(-50%, -50%);
+  margin: 0 !important;
+  padding: 18px;
+  background: #141821;
+  border: 1px solid rgba(120, 150, 255, .28);
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, .62),
+    0 28px 90px rgba(0, 0, 0, .55),
+    0 0 0 1px rgba(79, 124, 255, .10);
+  animation: orcModalIn .16s ease-out;
+}
+
+@keyframes orcModalIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -47%) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.orc-card-adicionar::before {
+  content: 'Janela de inclusão';
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-bottom: 10px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(79,124,255,.12);
+  border: 1px solid rgba(79,124,255,.22);
+  color: #9db8ff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.orc-card-adicionar .ct {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.orc-card-adicionar .ct h3 {
+  font-size: 16px;
+}
+
+.orc-card-adicionar .ct p {
+  max-width: 720px;
+}
+
+.orc-card-adicionar .orc-form-acoes {
+  position: sticky;
+  bottom: -18px;
+  margin-left: -18px;
+  margin-right: -18px;
+  margin-bottom: -18px;
+  padding: 14px 18px 18px;
+  background: linear-gradient(180deg, rgba(20,24,33,.84), #141821 38%);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.orc-card-adicionar .orc-form-acoes .btn {
+  min-height: 36px;
+}
+
+body:has(.orc-card-adicionar) {
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .orc-card-adicionar {
+    width: calc(100vw - 18px);
+    max-height: calc(100vh - 24px);
+    padding: 14px;
+  }
+
+  .orc-card-adicionar .orc-form-acoes {
+    bottom: -14px;
+    margin-left: -14px;
+    margin-right: -14px;
+    margin-bottom: -14px;
+    padding: 12px 14px 14px;
+  }
+}
+
+/* ServiçoPro - Central da OS em modal real
+   Mantem a lista de OS no fundo e abre a central sobre a tela. */
+.mbd {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 18px !important;
+  background: rgba(3, 6, 14, 0.78) !important;
+  backdrop-filter: blur(7px) !important;
+}
+
+.mbd .modal {
+  width: min(1280px, calc(100vw - 36px)) !important;
+  max-height: calc(100vh - 36px) !important;
+  overflow: auto !important;
+  background: #0c0f18 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 22px !important;
+  padding: 18px !important;
+  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.72) !important;
+}
+
+.mbd .mh {
+  position: sticky !important;
+  top: -18px !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: -18px -18px 16px -18px !important;
+  padding: 16px 18px !important;
+  background: rgba(12, 15, 24, 0.96) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.mbd .mh h3 {
+  margin: 0 !important;
+  color: #eef0f8 !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+}
+
+.mbd .mcl {
+  width: 34px !important;
+  height: 34px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #eef0f8 !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+}
+
+.mbd .mcl:hover {
+  background: rgba(240, 90, 90, 0.18) !important;
+  border-color: rgba(240, 90, 90, 0.35) !important;
+  color: #ff9b9b !important;
+}
+
+.mbd .card {
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+
+@media (max-width: 720px) {
+  .mbd {
+    padding: 10px !important;
+    place-items: stretch !important;
+  }
+
+  .mbd .modal {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 20px) !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ServiçoPro - Abas da Central da OS */
+.sp-os-central-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 16px 0;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.035);
+}
+
+.sp-os-central-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.035);
+  color: #9aa6d1;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.16s ease;
+}
+
+.sp-os-central-tabs button:hover {
+  color: #eef0f8;
+  background: rgba(79,124,255,0.12);
+  border-color: rgba(79,124,255,0.24);
+}
+
+.sp-os-central-tabs button.ativo {
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(79,124,255,0.38), rgba(34,211,238,0.18));
+  border-color: rgba(79,124,255,0.45);
+  box-shadow: 0 8px 24px rgba(79,124,255,0.16);
+}
+
+@media (max-width: 720px) {
+  .sp-os-central-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sp-os-central-tabs button {
+    width: 100%;
+  }
+}
+
+/* ServiçoPro - Refinamento visual do modal da Central da OS
+   Ajuste apenas de UX/CSS: nao altera backend, banco ou regra de negocio. */
+
+.mbd {
+  overflow: hidden !important;
+}
+
+.mbd .modal {
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(1220px, calc(100vw - 44px)) !important;
+  height: min(860px, calc(100vh - 44px)) !important;
+  max-height: calc(100vh - 44px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0 !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79, 124, 255, 0.55) rgba(255, 255, 255, 0.06) !important;
+}
+
+.mbd .modal::-webkit-scrollbar {
+  width: 10px;
+}
+
+.mbd .modal::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.045);
+  border-radius: 999px;
+}
+
+.mbd .modal::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(79, 124, 255, 0.8), rgba(34, 211, 238, 0.45));
+  border: 2px solid rgba(12, 15, 24, 0.95);
+  border-radius: 999px;
+}
+
+.mbd .modal::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(127, 169, 255, 0.95), rgba(34, 211, 238, 0.7));
+}
+
+.mbd .mh {
+  top: 0 !important;
+  margin: 0 !important;
+  padding: 16px 18px !important;
+  flex-shrink: 0 !important;
+}
+
+.mbd .sp-os-central-tabs {
+  position: sticky !important;
+  top: 67px !important;
+  z-index: 3 !important;
+  margin: 0 !important;
+  padding: 10px 18px !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-radius: 0 !important;
+  background: rgba(12, 15, 24, 0.96) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.mbd .sp-os-central-tabs + .card,
+.mbd .sp-os-central-tabs ~ .card,
+.mbd .sp-os-central-tabs ~ .ins,
+.mbd .sp-os-central-tabs ~ div {
+  margin-left: 18px;
+  margin-right: 18px;
+}
+
+.mbd .sp-os-central-tabs ~ .card {
+  margin-top: 16px;
+}
+
+.mbd .card {
+  border-radius: 16px !important;
+}
+
+.mbd .card .card {
+  border-radius: 14px !important;
+}
+
+.mbd .g.g-dash {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.mbd .g.g2 {
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.4fr) !important;
+  align-items: start !important;
+}
+
+.mbd .field {
+  margin-bottom: 12px !important;
+}
+
+.mbd .tw {
+  max-height: 360px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 124, 255, 0.45) rgba(255, 255, 255, 0.05);
+}
+
+.mbd .tw::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.mbd .tw::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mbd .tw::-webkit-scrollbar-thumb {
+  background: rgba(79, 124, 255, 0.6);
+  border-radius: 999px;
+}
+
+.mbd .ins {
+  border-radius: 10px !important;
+}
+
+.mbd > .modal > .ins,
+.mbd > .modal > .card,
+.mbd > .modal > div:not(.mh):not(.sp-os-central-tabs) {
+  margin-left: 18px;
+  margin-right: 18px;
+}
+
+.mbd > .modal > *:last-child {
+  margin-bottom: 18px !important;
+}
+
+/* Mantem o modal legivel em telas menores */
+@media (max-width: 980px) {
+  .mbd .modal {
+    width: calc(100vw - 24px) !important;
+    height: calc(100vh - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+  }
+
+  .mbd .g.g-dash {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .mbd .g.g2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mbd .sp-os-central-tabs {
+    top: 65px !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .mbd {
+    padding: 8px !important;
+  }
+
+  .mbd .modal {
+    width: calc(100vw - 16px) !important;
+    height: calc(100vh - 16px) !important;
+    max-height: calc(100vh - 16px) !important;
+    border-radius: 14px !important;
+  }
+
+  .mbd .sp-os-central-tabs {
+    grid-template-columns: 1fr 1fr !important;
+    padding: 8px 12px !important;
+  }
+
+  .mbd .sp-os-central-tabs button {
+    min-height: 32px !important;
+    padding: 7px 9px !important;
+    font-size: 11px !important;
+  }
+
+  .mbd > .modal > .ins,
+  .mbd > .modal > .card,
+  .mbd > .modal > div:not(.mh):not(.sp-os-central-tabs),
+  .mbd .sp-os-central-tabs + .card,
+  .mbd .sp-os-central-tabs ~ .card,
+  .mbd .sp-os-central-tabs ~ .ins,
+  .mbd .sp-os-central-tabs ~ div {
+    margin-left: 12px !important;
+    margin-right: 12px !important;
+  }
+}
+
+/* ServiçoPro - Fase 1.2 Nova OS compacta */
+.os-form-compacto {
+  display: grid;
+  gap: 14px;
+}
+
+.os-form-compacto-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.os-form-compacto-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.os-form-compacto .field {
+  margin-bottom: 0;
+}
+
+.os-form-compacto .btnMain {
+  margin-top: 4px;
+}
+
+.os-textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+#painel-nova-os .card {
+  border-color: rgba(79,124,255,.18);
+}
+
+#painel-nova-os .ct {
+  align-items: flex-start;
+}
+
+@media (max-width: 760px) {
+  .os-form-compacto-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ServiçoPro - Fase 1.3 Edição de dados principais da OS */
+.os-edicao-card {
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 1px solid rgba(79,124,255,.22);
+  border-radius: var(--r);
+  background: rgba(79,124,255,.055);
+}
+
+.os-edicao-card .ct {
+  margin-bottom: 14px;
+}
+
+.os-edicao-acoes {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.os-edicao-acoes .btnMain {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .os-edicao-acoes {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ServiçoPro - Fase 1.4 Itens da OS */
+.os-item-form-card {
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 1px solid rgba(79,124,255,.22);
+  border-radius: var(--r);
+  background: rgba(79,124,255,.045);
+}
+
+.os-item-form-card .ct {
+  margin-bottom: 14px;
+}
+
+.os-form-compacto-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.os-itens-tabela {
+  margin-top: 8px;
+}
+
+.os-itens-tabela table td,
+.os-itens-tabela table th {
+  white-space: normal;
+}
+
+@media (max-width: 760px) {
+  .os-form-compacto-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ServiçoPro - Fase 1.5 Modal e ações dos itens da OS */
+.sp-os-item-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.sp-os-item-modal {
+  width: min(920px, 96vw);
+  max-height: min(88vh, 820px);
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid rgba(79, 124, 255, 0.48);
+  border-radius: 18px;
+  background: #171b25;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.62);
+  color: #e9eefc;
+}
+
+.sp-os-item-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.sp-os-item-modal-head h3 {
+  margin: 10px 0 4px;
+  font-size: 19px;
+  font-weight: 850;
+}
+
+.sp-os-item-modal-head p {
+  margin: 0;
+  color: var(--t2);
+  line-height: 1.55;
+}
+
+.os-item-acoes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .sp-os-item-modal-backdrop {
+    padding: 12px;
+  }
+
+  .sp-os-item-modal {
+    width: 100%;
+    max-height: 92vh;
+    padding: 14px;
+  }
+
+  .sp-os-item-modal-head {
+    flex-direction: column;
+  }
+
+  .os-item-acoes {
+    flex-direction: column;
+  }
+}
+
+/* ServiçoPro - Fase 1.6A Filtros operacionais da lista de OS */
+.os-filtros-card {
+  margin: 12px 0 14px;
+  padding: 14px;
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  border-radius: var(--r);
+  background: rgba(79, 124, 255, 0.035);
+}
+
+.os-filtros-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.os-filtros-head strong {
+  display: block;
+  color: var(--t);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.os-filtros-head span {
+  display: block;
+  margin-top: 3px;
+  color: var(--t2);
+  font-size: 12px;
+}
+
+.os-filtros-grid {
+  display: grid;
+  grid-template-columns: 160px 160px minmax(180px, 1fr) minmax(180px, 1fr) minmax(220px, 1.2fr) 180px;
+  gap: 10px;
+  align-items: end;
+}
+
+.os-filtros-grid .field {
+  margin: 0;
+}
+
+@media (max-width: 1180px) {
+  .os-filtros-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .os-filtros-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .os-filtros-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ServiçoPro - Fase 1.6B Ordenação do grid de OS */
+.os-th-sort {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  font-weight: 850;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.os-th-sort:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.os-th-sort.ativo {
+  color: #8fb2ff;
+}
+
+/* ServiçoPro - Fase 1.7A Filtros e grid de Orçamentos no padrão OS */
+.orc-filtros-card {
+  margin: 12px 0 14px;
+  padding: 14px;
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  border-radius: var(--r);
+  background: rgba(79, 124, 255, 0.035);
+}
+
+.orc-filtros-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.orc-filtros-head strong {
+  display: block;
+  color: var(--t);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.orc-filtros-head span {
+  display: block;
+  margin-top: 3px;
+  color: var(--t2);
+  font-size: 12px;
+}
+
+.orc-filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(145px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.orc-filtros-grid .field {
+  margin: 0;
+}
+
+.orc-grid-operacional {
+  margin: 8px 0 14px;
+}
+
+.orc-grid-operacional table th,
+.orc-grid-operacional table td {
+  white-space: nowrap;
+}
+
+.orc-th-sort {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  font-weight: 850;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.orc-th-sort:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.orc-th-sort.ativo {
+  color: #8fb2ff;
+}
+
+.orc-grid-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+@media (max-width: 1280px) {
+  .orc-filtros-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .orc-filtros-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .orc-filtros-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .orc-grid-acoes {
+    flex-direction: column;
+  }
+}
+
+/* ServiçoPro - Fase 1.7B filtro compacto de datas em Orçamentos */
+.orc-filtros-card.compacto {
+  padding: 12px;
+}
+
+.orc-filtros-grid.compacto {
+  grid-template-columns: 180px 160px 160px minmax(190px, 1fr) minmax(190px, 1fr) minmax(210px, 1.2fr) 160px;
+}
+
+@media (max-width: 1280px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ServiçoPro - Fase 1.7C filtros de orçamento no mesmo nível */
+.orc-filtros-card.compacto .orc-filtros-head {
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.orc-filtros-grid.compacto {
+  grid-template-columns: 150px 120px 120px minmax(210px, 1fr) minmax(210px, 1fr) minmax(260px, 1.25fr) 140px 118px;
+  align-items: end;
+}
+
+.orc-filtros-grid.compacto .field {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.orc-filtros-grid.compacto .inp {
+  height: 42px;
+}
+
+.orc-filtro-acao {
+  display: flex;
+  align-items: end;
+  height: 100%;
+  padding-bottom: 1px;
+}
+
+.orc-filtro-acao .btn {
+  width: 100%;
+  height: 42px;
+}
+
+@media (max-width: 1380px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: 1fr;
+  }
+
+  .orc-filtro-acao {
+    padding-bottom: 0;
+  }
+}
+
+/* ServiçoPro - Fase 1.7D nomes e espaçamento dos filtros de orçamento */
+.orc-filtros-card.compacto {
+  padding: 10px 12px;
+}
+
+.orc-filtros-card.compacto .orc-filtros-head {
+  margin-bottom: 8px;
+}
+
+.orc-filtros-grid.compacto {
+  grid-template-columns: 132px 96px 96px minmax(190px, 1fr) minmax(190px, 1fr) minmax(230px, 1.25fr) 128px 88px;
+  gap: 8px;
+}
+
+.orc-filtros-grid.compacto .field > span {
+  font-size: 11px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.orc-filtros-grid.compacto .inp {
+  height: 40px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.orc-filtro-acao .btn {
+  height: 40px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+@media (max-width: 1380px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ServiçoPro - Fase 1.7E correção definitiva da sobreposição dos filtros de orçamento */
+.orc-filtros-card.compacto {
+  overflow: visible;
+}
+
+.orc-filtros-grid.compacto {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 0.8fr)
+    minmax(145px, 0.7fr)
+    minmax(145px, 0.7fr)
+    minmax(220px, 1.1fr)
+    minmax(220px, 1.1fr)
+    minmax(260px, 1.3fr)
+    minmax(150px, 0.8fr)
+    minmax(105px, 0.55fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.orc-filtros-grid.compacto .field {
+  min-width: 0;
+}
+
+.orc-filtros-grid.compacto .field > span {
+  display: block;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+
+.orc-filtros-grid.compacto .inp {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.orc-filtro-acao {
+  min-width: 0;
+}
+
+.orc-filtro-acao .btn {
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.1;
+}
+
+/* Em telas menores, quebra antes de sobrepor */
+@media (max-width: 1680px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns:
+      minmax(150px, 1fr)
+      minmax(145px, 1fr)
+      minmax(145px, 1fr)
+      minmax(220px, 1.4fr)
+      minmax(220px, 1.4fr)
+      minmax(260px, 1.6fr);
+  }
+
+  .orc-filtro-acao {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 1280px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: repeat(3, minmax(190px, 1fr));
+  }
+
+  .orc-filtro-acao .btn {
+    height: 40px;
+  }
+}
+
+@media (max-width: 860px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .orc-filtros-grid.compacto {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ServiçoPro - Fase 1.7G correção do corte inferior dos filtros de orçamento */
+.orc-filtros-card.compacto {
+  padding: 14px 14px 18px !important;
+  min-height: auto;
+  overflow: visible !important;
+}
+
+.orc-filtros-card.compacto .orc-filtros-head {
+  margin-bottom: 12px !important;
+}
+
+.orc-filtros-grid.compacto {
+  align-items: end;
+  row-gap: 14px;
+  padding-bottom: 2px;
+  overflow: visible !important;
+}
+
+.orc-filtros-grid.compacto .field {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 7px;
+  min-height: 62px;
+  overflow: visible !important;
+}
+
+.orc-filtros-grid.compacto .field > span {
+  display: block;
+  min-height: 14px;
+  line-height: 14px;
+  margin: 0;
+}
+
+.orc-filtros-grid.compacto .inp {
+  height: 42px !important;
+  min-height: 42px !important;
+  line-height: 1.2;
+}
+
+.orc-filtro-acao {
+  display: flex !important;
+  align-items: flex-end !important;
+  min-height: 62px;
+  padding-bottom: 0 !important;
+  overflow: visible !important;
+}
+
+.orc-filtro-acao .btn {
+  height: 42px !important;
+  min-height: 42px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ServiçoPro - Fase 1.7I linha clicável no grid de Orçamentos */
+.orc-grid-operacional tbody tr.orc-grid-linha-clicavel {
+  cursor: pointer;
+}
+
+.orc-grid-operacional tbody tr.orc-grid-linha-clicavel:hover {
+  background: rgba(79, 124, 255, 0.075);
+}
+
+.orc-grid-operacional tbody tr.orc-grid-linha-clicavel:hover td {
+  color: #ffffff;
+}
+
+.orc-grid-operacional .orc-grid-acoes,
+.orc-grid-operacional .orc-grid-acoes button {
+  cursor: default;
+}
+
+.orc-grid-operacional .orc-grid-acoes button {
+  cursor: pointer;
+}
+
+/* ServiçoPro - Fase 1.7J bloqueio visual de orçamento finalizado */
+.orc-aviso-finalizado {
+  border-color: rgba(245, 158, 11, 0.32);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.orc-itens-header:has(.orc-aviso-finalizado) {
+  opacity: 0.98;
+}
+
+/* ServiçoPro - UX Fase 1.8A: visual operacional mais leve e informativo */
+.content {
+  padding-top: 18px;
+}
+
+.sh {
+  margin-bottom: 16px;
+}
+
+.sh-l .ey {
+  color: #7fa9ff;
+  opacity: .82;
+}
+
+.sh-l h2 {
+  font-size: 18px;
+  letter-spacing: -.045em;
+}
+
+.sh-l p {
+  color: #a8b2d4;
+  max-width: 720px;
+}
+
+.card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.025)),
+    rgba(255,255,255,.025);
+  border-color: rgba(255,255,255,.095);
+  box-shadow: 0 16px 48px rgba(0,0,0,.16);
+}
+
+.card > .sh,
+.card .sh {
+  margin-bottom: 14px;
+}
+
+.card h3 {
+  letter-spacing: -.03em;
+}
+
+.orc-filtros-card,
+.os-filtros-card {
+  background:
+    linear-gradient(180deg, rgba(79,124,255,.055), rgba(255,255,255,.022)),
+    rgba(255,255,255,.025);
+  border-color: rgba(79,124,255,.18);
+}
+
+.orc-filtros-head strong,
+.os-filtros-head strong {
+  font-size: 12px;
+  letter-spacing: -.01em;
+}
+
+.orc-filtros-head small,
+.os-filtros-head small {
+  color: #8d95b4;
+}
+
+.orc-grid-operacional table,
+.tw table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.orc-grid-operacional thead th,
+.tw thead th {
+  color: #667198;
+  font-size: 10.5px;
+  letter-spacing: .075em;
+}
+
+.orc-grid-operacional tbody tr,
+.tw tbody tr {
+  transition: background .14s ease, color .14s ease;
+}
+
+.orc-grid-operacional tbody tr:hover,
+.tw tbody tr:hover {
+  background: rgba(79,124,255,.055);
+}
+
+.orc-contexto-card,
+.orc-resumo-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.022));
+  border-color: rgba(255,255,255,.09);
+}
+
+.orc-resumo-card-total {
+  background:
+    linear-gradient(135deg, rgba(79,124,255,.18), rgba(79,124,255,.075));
+  border-color: rgba(79,124,255,.35);
+}
+
+.ins {
+  border-radius: 12px;
+}
+
+.ins strong {
+  color: #dbe6ff;
+}
+
+.badge {
+  letter-spacing: -.005em;
+}
+
+.btn {
+  box-shadow: none;
+}
+
+.btn.ba,
+.btn.bp {
+  box-shadow: 0 5px 18px rgba(79,124,255,.13);
+}
+
+.btn.bd {
+  box-shadow: 0 5px 18px rgba(240,90,90,.08);
+}
+
+.btn.bg {
+  box-shadow: 0 5px 18px rgba(34,211,160,.08);
+}
+
+/* Menos ruído visual nos blocos de detalhe */
+.orc-contexto-titulo {
+  color: #667198;
+}
+
+.orc-contexto-linha span {
+  color: #667198;
+}
+
+.orc-contexto-linha strong {
+  color: #dce6ff;
+}
+
+/* Ajuda/rodapé operacional mais discreto */
+.card > .ins:last-child,
+section.card > .ins:last-child {
+  color: #a8b2d4;
+}
+
+/* ServiçoPro - UX Fase 1.8B: cabeçalho operacional mais limpo */
+.sp-content-operacional-limpo > .sh {
+  display: none;
+}
+
+.sp-content-operacional-limpo {
+  padding-top: 20px;
+}
+
+.sp-content-operacional-limpo > .card:first-child {
+  margin-top: 0;
+}
+
+/* O card principal vira o título real da tela operacional */
+.sp-content-operacional-limpo > .card:first-child > .sh h3,
+.sp-content-operacional-limpo > .card:first-child h3:first-child {
+  font-size: 15px;
+  letter-spacing: -.035em;
+}
+
+/* Mensagens de fluxo ficam mais discretas */
+.sp-content-operacional-limpo .ins {
+  font-size: 12.5px;
+  color: #aab4d6;
+}
+
+/* Menos peso visual em textos auxiliares dentro dos cards */
+.sp-content-operacional-limpo .card p {
+  color: #aab4d6;
+}
+
+/* Ações superiores mais limpas */
+.sp-content-operacional-limpo .sh-r .btn,
+.sp-content-operacional-limpo .card .btn {
+  font-weight: 700;
+}
+
+/* ServiçoPro - UX Fase 1.8C: textos operacionais mais discretos */
+.sp-content-operacional-limpo .ins strong {
+  color: #dce6ff;
+}
+
+.sp-content-operacional-limpo .ins {
+  background: rgba(79,124,255,.055);
+  border-color: rgba(79,124,255,.22);
+}
+
+.sp-content-operacional-limpo .card .ins:last-child {
+  margin-top: 10px;
+}
+
+
+/* ServiçoPro - Fase 1.8C-1: modal opaco para itens do orçamento */
+.orc-card-adicionar {
+  position: fixed !important;
+  z-index: 9999 !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+
+  width: min(860px, calc(100vw - 40px)) !important;
+  max-height: min(86vh, 760px) !important;
+  overflow: auto !important;
+
+  background:
+    linear-gradient(180deg, #1b1f2b 0%, #151923 48%, #111620 100%) !important;
+  border: 1px solid rgba(94, 129, 255, 0.52) !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, 0.78),
+    0 34px 120px rgba(0, 0, 0, 0.86),
+    0 0 0 1px rgba(79, 124, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.orc-card-adicionar::before {
+  content: "Janela de inclusão";
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 10px 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(79, 124, 255, 0.20) !important;
+  border: 1px solid rgba(105, 139, 255, 0.36) !important;
+  color: #dce6ff !important;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.orc-card-adicionar .ct {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09) !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+.orc-card-adicionar .ct h3 {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  letter-spacing: -0.03em !important;
+}
+
+.orc-card-adicionar .ct p {
+  color: #c5d3ff !important;
+}
+
+.orc-card-adicionar .inp,
+.orc-card-adicionar select,
+.orc-card-adicionar textarea {
+  background: #242936 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #f4f7ff !important;
+}
+
+.orc-card-adicionar .inp:focus,
+.orc-card-adicionar select:focus,
+.orc-card-adicionar textarea:focus {
+  border-color: rgba(99, 132, 255, 0.82) !important;
+  box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.18) !important;
+}
+
+.orc-card-adicionar .orc-form-acoes {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 2 !important;
+  margin: 16px -2px -2px -2px !important;
+  padding: 14px 0 0 0 !important;
+  background: linear-gradient(180deg, rgba(21,25,35,0), #151923 30%, #151923 100%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body:has(.orc-card-adicionar) {
+  overflow: hidden !important;
+}
+
+@media (max-width: 760px) {
+  .orc-card-adicionar {
+    width: calc(100vw - 22px) !important;
+    max-height: calc(100vh - 24px) !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ServiçoPro - Fase 1.8C-2: criar orçamento em modal sobre o grid */
+.sp-orcamento-criacao-modal-host {
+  display: contents;
+}
+
+.sp-orcamento-criacao-modal-host > .card,
+.sp-orcamento-criacao-modal-host > section.card {
+  position: fixed !important;
+  z-index: 10000 !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+
+  width: min(720px, calc(100vw - 40px)) !important;
+  max-height: min(90vh, 820px) !important;
+  overflow: auto !important;
+
+  margin: 0 !important;
+  padding: 22px !important;
+
+  background:
+    linear-gradient(180deg, #1b1f2b 0%, #151923 48%, #111620 100%) !important;
+  border: 1px solid rgba(94, 129, 255, 0.52) !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, 0.80),
+    0 34px 120px rgba(0, 0, 0, 0.88),
+    0 0 0 1px rgba(79, 124, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.sp-orcamento-criacao-modal-host > .card::before,
+.sp-orcamento-criacao-modal-host > section.card::before {
+  content: "Novo orçamento";
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 10px 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(79, 124, 255, 0.20) !important;
+  border: 1px solid rgba(105, 139, 255, 0.36) !important;
+  color: #dce6ff !important;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sp-orcamento-criacao-modal-host .card h3,
+.sp-orcamento-criacao-modal-host section.card h3 {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  letter-spacing: -0.03em !important;
+}
+
+.sp-orcamento-criacao-modal-host .card p,
+.sp-orcamento-criacao-modal-host section.card p {
+  color: #c5d3ff !important;
+}
+
+.sp-orcamento-criacao-modal-host .inp,
+.sp-orcamento-criacao-modal-host select,
+.sp-orcamento-criacao-modal-host textarea {
+  background: #242936 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #f4f7ff !important;
+}
+
+.sp-orcamento-criacao-modal-host .inp:focus,
+.sp-orcamento-criacao-modal-host select:focus,
+.sp-orcamento-criacao-modal-host textarea:focus {
+  border-color: rgba(99, 132, 255, 0.82) !important;
+  box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.18) !important;
+}
+
+.sp-orcamento-criacao-modal-host button[type="submit"],
+.sp-orcamento-criacao-modal-host .btnMain {
+  min-height: 44px !important;
+}
+
+body:has(.sp-orcamento-criacao-modal-host > .card),
+body:has(.sp-orcamento-criacao-modal-host > section.card) {
+  overflow: hidden !important;
+}
+
+@media (max-width: 760px) {
+  .sp-orcamento-criacao-modal-host > .card,
+  .sp-orcamento-criacao-modal-host > section.card {
+    width: calc(100vw - 22px) !important;
+    max-height: calc(100vh - 24px) !important;
+    border-radius: 14px !important;
+    padding: 16px !important;
+  }
+}
+
+
+/* ServiçoPro - Fase 1.8C-2 v2: força criação de orçamento como modal real */
+.sp-orcamento-criacao-modal-host:has(.card),
+.sp-orcamento-criacao-modal-host:has(section.card) {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10050 !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 22px !important;
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(7px) !important;
+  -webkit-backdrop-filter: blur(7px) !important;
+
+  overflow: auto !important;
+}
+
+.sp-orcamento-criacao-modal-host:has(.card) > .card,
+.sp-orcamento-criacao-modal-host:has(section.card) > section.card,
+.sp-orcamento-criacao-modal-host:has(.card) .card:first-child,
+.sp-orcamento-criacao-modal-host:has(section.card) section.card:first-child {
+  position: relative !important;
+  z-index: 10051 !important;
+
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+
+  width: min(720px, calc(100vw - 44px)) !important;
+  max-height: min(90vh, 820px) !important;
+  overflow: auto !important;
+
+  margin: 0 auto !important;
+  padding: 22px !important;
+
+  background:
+    linear-gradient(180deg, #1b1f2b 0%, #151923 48%, #111620 100%) !important;
+  border: 1px solid rgba(94, 129, 255, 0.56) !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 36px 120px rgba(0, 0, 0, 0.88),
+    0 0 0 1px rgba(79, 124, 255, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.sp-orcamento-criacao-modal-host:has(.card) > .card::before,
+.sp-orcamento-criacao-modal-host:has(section.card) > section.card::before,
+.sp-orcamento-criacao-modal-host:has(.card) .card:first-child::before,
+.sp-orcamento-criacao-modal-host:has(section.card) section.card:first-child::before {
+  content: "Novo orçamento";
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 10px 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(79, 124, 255, 0.20) !important;
+  border: 1px solid rgba(105, 139, 255, 0.36) !important;
+  color: #dce6ff !important;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sp-orcamento-criacao-modal-host:has(.card) .card h3,
+.sp-orcamento-criacao-modal-host:has(section.card) section.card h3 {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  letter-spacing: -0.03em !important;
+}
+
+.sp-orcamento-criacao-modal-host:has(.card) .card p,
+.sp-orcamento-criacao-modal-host:has(section.card) section.card p {
+  color: #c5d3ff !important;
+}
+
+.sp-orcamento-criacao-modal-host:has(.card) .inp,
+.sp-orcamento-criacao-modal-host:has(.card) select,
+.sp-orcamento-criacao-modal-host:has(.card) textarea,
+.sp-orcamento-criacao-modal-host:has(section.card) .inp,
+.sp-orcamento-criacao-modal-host:has(section.card) select,
+.sp-orcamento-criacao-modal-host:has(section.card) textarea {
+  background: #242936 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #f4f7ff !important;
+}
+
+.sp-orcamento-criacao-modal-host:has(.card) button[type="submit"],
+.sp-orcamento-criacao-modal-host:has(section.card) button[type="submit"],
+.sp-orcamento-criacao-modal-host:has(.card) .btnMain,
+.sp-orcamento-criacao-modal-host:has(section.card) .btnMain {
+  min-height: 44px !important;
+}
+
+body:has(.sp-orcamento-criacao-modal-host .card),
+body:has(.sp-orcamento-criacao-modal-host section.card) {
+  overflow: hidden !important;
+}
+
+@media (max-width: 760px) {
+  .sp-orcamento-criacao-modal-host:has(.card),
+  .sp-orcamento-criacao-modal-host:has(section.card) {
+    padding: 12px !important;
+  }
+
+  .sp-orcamento-criacao-modal-host:has(.card) > .card,
+  .sp-orcamento-criacao-modal-host:has(section.card) > section.card,
+  .sp-orcamento-criacao-modal-host:has(.card) .card:first-child,
+  .sp-orcamento-criacao-modal-host:has(section.card) section.card:first-child {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+    border-radius: 14px !important;
+    padding: 16px !important;
+  }
+}
+
+/* ServiçoPro - Fase 1.8C-2 v3: modal de novo orçamento controlado por estado */
+
+/* Quando NÃO está criando orçamento, o host não pode escurecer nem bloquear a tela */
+body:not(.sp-orcamento-criando) .sp-orcamento-criacao-modal-host {
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+  display: contents !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Neutraliza as regras antigas baseadas em :has(.card) fora do modo criação */
+body:not(.sp-orcamento-criando) .sp-orcamento-criacao-modal-host > .card,
+body:not(.sp-orcamento-criando) .sp-orcamento-criacao-modal-host > section.card {
+  position: static !important;
+  z-index: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* No modo criação, o host vira o overlay real */
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10080 !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 22px !important;
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(7px) !important;
+  -webkit-backdrop-filter: blur(7px) !important;
+
+  overflow: auto !important;
+  pointer-events: auto !important;
+}
+
+/* No modo criação, apenas o card de novo registro deve aparecer como modal */
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card {
+  position: relative !important;
+  z-index: 10081 !important;
+
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+
+  width: min(720px, calc(100vw - 44px)) !important;
+  max-height: min(90vh, 820px) !important;
+  overflow: auto !important;
+
+  margin: 0 auto !important;
+  padding: 22px !important;
+
+  background:
+    linear-gradient(180deg, #1b1f2b 0%, #151923 48%, #111620 100%) !important;
+  border: 1px solid rgba(94, 129, 255, 0.56) !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 36px 120px rgba(0, 0, 0, 0.88),
+    0 0 0 1px rgba(79, 124, 255, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card::before,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card::before {
+  content: "Novo orçamento";
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 10px 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(79, 124, 255, 0.20) !important;
+  border: 1px solid rgba(105, 139, 255, 0.36) !important;
+  color: #dce6ff !important;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body.sp-orcamento-criando {
+  overflow: hidden !important;
+}
+
+@media (max-width: 760px) {
+  body.sp-orcamento-criando .sp-orcamento-criacao-modal-host {
+    padding: 12px !important;
+  }
+
+  body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card,
+  body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+    border-radius: 14px !important;
+    padding: 16px !important;
+  }
+}
+
+/* ServiçoPro - Fase 1.8C-2 v4.1: estabilização do modal Novo Orçamento */
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host {
+  pointer-events: auto !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  width: min(760px, calc(100vw - 44px)) !important;
+  max-height: min(90vh, 820px) !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card .btnMain,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card .btnMain {
+  min-height: 44px !important;
+}
+
+/* ServiçoPro - Fase 1.8C-2 v4.2: formulário nativo limpo de novo orçamento */
+.form-orcamento-limpo {
+  gap: 14px !important;
+}
+
+.form-orcamento-limpo .sp-orcamento-form-dica {
+  margin: 0 0 4px 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+  background: rgba(79, 124, 255, 0.12) !important;
+  border: 1px solid rgba(105, 139, 255, 0.26) !important;
+  color: #cfdafe !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+
+.form-orcamento-limpo .sp-orcamento-form-dica strong {
+  color: #ffffff !important;
+}
+
+.form-orcamento-limpo .sp-orcamento-form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.form-orcamento-limpo textarea.inp {
+  min-height: 88px !important;
+  resize: vertical !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card {
+  width: min(940px, calc(100vw - 56px)) !important;
+  max-height: min(86vh, 760px) !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card::before,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card::before {
+  content: "Novo orçamento" !important;
+}
+
+@media (max-width: 900px) {
+  .form-orcamento-limpo .sp-orcamento-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ServiçoPro - Fase 1.8C-2 v4.3: ajustes finais do modal Novo Orçamento limpo */
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card {
+  width: min(940px, calc(100vw - 56px)) !important;
+  max-height: min(84vh, 720px) !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card::-webkit-scrollbar,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card::-webkit-scrollbar {
+  width: 10px;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card::-webkit-scrollbar-track,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.05);
+  border-radius: 999px;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > .card::-webkit-scrollbar-thumb,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host > section.card::-webkit-scrollbar-thumb {
+  background: rgba(105,139,255,.36);
+  border-radius: 999px;
+}
+
+.form-orcamento-limpo .btnMain {
+  margin-top: 4px !important;
+}
+
+/* ServiçoPro - Fase 1.8C-2 v4.4: reforço visual do modal Novo Orçamento */
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10080 !important;
+  display: grid !important;
+  place-items: center !important;
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(7px) !important;
+  -webkit-backdrop-filter: blur(7px) !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host .card:first-child,
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host section.card:first-child {
+  width: 100% !important;
+  max-height: min(84vh, 720px) !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host .g {
+  grid-template-columns: 1fr !important;
+}
+
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host .card:nth-child(2),
+body.sp-orcamento-criando .sp-orcamento-criacao-modal-host section.card:nth-child(2) {
+  display: none !important;
+}
+
