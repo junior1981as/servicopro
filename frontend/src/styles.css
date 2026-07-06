@@ -193,7 +193,7 @@ button {
 
 .lbl {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--t3);
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -269,14 +269,14 @@ button {
 
 .t-lbl {
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--t3);
   text-transform: uppercase;
   letter-spacing: .07em;
 }
 
 .t-name {
-  font-weight: 800;
+  font-weight: 700;
   margin: 3px 0 7px;
 }
 
@@ -491,7 +491,7 @@ button {
   padding: 8px 13px;
   border-radius: 9px;
   border: 1px solid var(--b1);
-  font-weight: 800;
+  font-weight: 600;
   background: var(--s1);
   color: var(--t2);
 }
@@ -530,7 +530,7 @@ button {
   color: var(--ac);
   font-size: 10px;
   text-transform: uppercase;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: .12em;
 }
 
@@ -748,9 +748,91 @@ td {
   color: var(--t2);
 }
 
+/* --- RESPONSIVIDADE E UX PREMIUM --- */
+
+/* Scrollbars modernos para toda a aplicação */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(7, 9, 15, 0.4);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Botão de Menu Toggle (Hambúrguer) */
+.btn-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  color: var(--t1);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0;
+}
+
+.btn-menu-toggle:hover {
+  background: var(--s3);
+  border-color: var(--b2);
+  transform: scale(1.03);
+}
+
+.btn-menu-toggle:active {
+  transform: scale(0.97);
+}
+
+/* Logo / Marca do Topo no Mobile */
+.topbar-mobile-logo {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -.02em;
+  color: var(--t1);
+}
+
+/* Grid com comportamento flexível/responsivo para cadastros e operações */
+.g-split {
+  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.6fr);
+}
+
+/* Overlay da barra lateral no celular */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app.sidebar-aberta .sidebar-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (max-width: 1080px) {
-  .login,
-  .app {
+  .login {
     grid-template-columns: 1fr;
   }
 
@@ -758,15 +840,66 @@ td {
     display: none;
   }
 
-  .sidebar {
+  .app {
+    grid-template-columns: 1fr !important;
     position: relative;
-    height: auto;
+    overflow-x: hidden;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -280px !important;
+    width: 280px !important;
+    height: 100vh !important;
+    z-index: 1002 !important;
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.9) !important;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    background: var(--bg2) !important;
+  }
+
+  .app.sidebar-aberta .sidebar {
+    left: 0 !important;
+  }
+
+  .btn-menu-toggle {
+    display: inline-flex;
+  }
+
+  .topbar-mobile-logo {
+    display: flex;
   }
 
   .g-dash,
   .g4,
   .gw {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+  }
+
+  .g-split {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Ajustar o espaçamento do conteúdo operacional */
+  .content {
+    padding: 16px 14px !important;
+  }
+
+  .topbar {
+    padding: 12px 14px !important;
+  }
+}
+
+/* Melhorar responsividade do formulário compacto do orçamento e grids no mobile */
+@media (max-width: 640px) {
+  .os-form-compacto-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+  .orc-resumo-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .orc-painel-itens {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -822,7 +955,7 @@ select.inp:focus {
 .orc-resumo-card span {
   color: var(--t3);
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .07em;
 }
@@ -830,7 +963,7 @@ select.inp:focus {
 .orc-resumo-card strong {
   color: var(--t1);
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -.03em;
 }
 
@@ -932,7 +1065,7 @@ select.inp:focus {
 .orc-contexto-titulo span {
   color: var(--t3);
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .08em;
 }
@@ -940,7 +1073,7 @@ select.inp:focus {
 .orc-contexto-titulo strong {
   color: var(--t1);
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: -.02em;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -965,7 +1098,7 @@ select.inp:focus {
   display: block;
   color: var(--t3);
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: .06em;
   margin-bottom: 3px;
@@ -975,7 +1108,7 @@ select.inp:focus {
   display: block;
   color: var(--t2);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2985,5 +3118,42 @@ body.sp-orcamento-criando .sp-orcamento-criacao-modal-host .g {
 body.sp-orcamento-criando .sp-orcamento-criacao-modal-host .card:nth-child(2),
 body.sp-orcamento-criando .sp-orcamento-criacao-modal-host section.card:nth-child(2) {
   display: none !important;
+}
+
+/* --- FIX VIEWPORT LAYOUT & ELIMINATE EXTERNAL SCROLLBARS --- */
+@media (min-width: 1081px) {
+  html, body {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  #root {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  .app {
+    height: 100vh !important;
+    overflow: hidden !important;
+    grid-template-rows: 100vh !important;
+  }
+
+  .sidebar {
+    height: 100vh !important;
+    overflow-y: auto !important;
+  }
+
+  .workspace {
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: grid !important;
+    grid-template-rows: auto 1fr !important;
+  }
+
+  .content {
+    height: 100% !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+  }
 }
 

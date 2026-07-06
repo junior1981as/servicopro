@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import React, { useEffect, useMemo, useState, type ReactNode } from 'react';
 import PainelOsCentroOperacional from './PainelOsCentroOperacional';
 import { salvarOsAtiva } from './osAtivaStore';
 import OrcamentoItens from './OrcamentoItens';
@@ -362,6 +362,7 @@ function mostrarModalVisualApp(opcoes: ModalVisualAppOpcoes): Promise<boolean> {
 
 function App() {
   const [pagina, setPagina] = useState<Pagina>('dashboard');
+  const [sidebarAberta, setSidebarAberta] = useState(false);
   const [ordemCentralAbertaId, setOrdemCentralAbertaId] = useState('');
   const [editandoOrdemId, setEditandoOrdemId] = useState('');
   const [abaCentralOs, setAbaCentralOs] = useState<'resumo' | 'requisicoes' | 'historico' | 'acoes'>('resumo');
@@ -1380,7 +1381,8 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${sidebarAberta ? 'sidebar-aberta' : ''}`}>
+      <div className="sidebar-overlay" onClick={() => setSidebarAberta(false)} />
       <aside className="sidebar">
         <div className="sbrand">
           <div className="bmark">⚡</div>
@@ -1431,6 +1433,7 @@ function App() {
                     setBusca('');
                     setErroDados('');
                     setSucessoDados('');
+                    setSidebarAberta(false);
 
                                         if (item.id === 'orcamentos') {
                       window.dispatchEvent(new Event('servicopro:orcamentos:voltar-grid'));
@@ -1466,6 +1469,31 @@ if (item.id === 'ordens') {
 
       <section className="workspace">
         <header className="topbar">
+          <button
+            type="button"
+            className="btn-menu-toggle"
+            onClick={() => setSidebarAberta(!sidebarAberta)}
+            title="Menu"
+          >
+            ☰
+          </button>
+
+          <div className="topbar-mobile-logo">
+            <span style={{
+              width: 26,
+              height: 26,
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, #4f7cff, #22d3a0)',
+              display: 'grid',
+              placeItems: 'center',
+              fontSize: 13,
+              fontWeight: 900,
+              color: '#fff',
+              boxShadow: '0 4px 12px rgba(79,124,255,.25)'
+            }}>⚡</span>
+            <span>ServiçoPro</span>
+          </div>
+
           <div className="tr">
             <button
               className="btn bo bsm"
@@ -2317,7 +2345,7 @@ function CadastroModulo(props: CadastroModuloProps) {
   }, [busca, cadastros, pagina]);
 
   return (
-    <div className="g" style={{ gridTemplateColumns: 'minmax(320px, 0.85fr) minmax(0, 1.6fr)' }}>
+    <div className="g g-split">
       <div className="card">
         <div className="ct">
           <div>
@@ -2384,7 +2412,7 @@ function OperacaoModulo(props: OperacaoModuloProps) {
   }, [busca, dadosFonte]);
 
   return (
-    <div className="g" style={{ gridTemplateColumns: 'minmax(320px, 0.85fr) minmax(0, 1.6fr)' }}>
+    <div className="g g-split">
       <div className="card">
         <div className="ct">
           <div>
