@@ -1,0 +1,6 @@
+{
+  "name": "ServiçoPro ERP",
+  "description": "ERP completo para pequenas empresas e prestadores de serviços com ordens de serviço, orçamentos, agenda, produtos, ativos e gestão financeira.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
