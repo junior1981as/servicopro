@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/ClienteAtivoVinculoGuard.tsx","./src/ConfigEmpresa.tsx","./src/OrcamentoItens.tsx","./src/OsEstoque.tsx","./src/OsEstoqueComOsAtiva.tsx","./src/PainelOsCentroOperacional.tsx","./src/enterProximoCampoGlobal.ts","./src/main.tsx","./src/osAtivaStore.ts","./src/vite-env.d.ts"],"version":"5.9.3"}

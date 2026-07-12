@@ -1,0 +1,6 @@
+{
+  "name": "ServiçoPro SaaS ERP",
+  "description": "SaaS ERP modular para prestadores de serviços com gestão de clientes, equipamentos, ordem de serviço, estoque, compras e financeiro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
