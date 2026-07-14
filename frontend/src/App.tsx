@@ -478,7 +478,7 @@ export default function App() {
   };
 
   // --- Core Business Logic: Closing the OS ---
-  const handleCloseWorkOrder = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  const handleCloseWorkOrder = async (id: string, discount: number = 0): Promise<{ success: boolean; error?: string }> => {
     const wo = workOrders.find(item => item.id === id);
     if (!wo) return { success: false, error: "Ordem de Serviço não encontrada." };
 
@@ -487,7 +487,7 @@ export default function App() {
     if (!wo.diagnosis) return { success: false, error: "Preenchimento do Diagnóstico Técnico é obrigatório para fechar a OS." };
 
     try {
-      await api.closeWorkOrder(id, wo.diagnosis);
+      await api.closeWorkOrder(id, wo.diagnosis, discount);
       
       // Reload states affected by closing an OS
       setWorkOrders(await api.getWorkOrders());
@@ -582,7 +582,7 @@ export default function App() {
     }
   };
 
-  const handleEditTransaction = async (id: string, data: { dueDate?: string; amount?: number; description?: string }) => {
+  const handleEditTransaction = async (id: string, data: { dueDate?: string; amount?: number; desconto?: number; description?: string }) => {
     try {
       await api.editTransaction(id, data);
       setTransactions(await api.getTransactions());
@@ -600,12 +600,36 @@ export default function App() {
     }
   };
 
-  const handleCreateContaBancaria = async (data: { nome: string; tipo: string; saldoInicial: number }) => {
+  const handleUndoTransactionSource = async (id: string) => {
+    try {
+      await api.undoTransactionSource(id);
+      setTransactions(await api.getTransactions());
+      setWorkOrders(await api.getWorkOrders());
+      setPurchases(await api.getPurchases());
+      setProducts(await api.getProducts()); // Update stock
+      showAlert("success", "Faturamento Desfeito", "A operação foi revertida com sucesso e o estoque foi restaurado.");
+    } catch (err: any) {
+      showAlert('error', 'Erro ao Desfazer', err.message);
+    }
+  };
+
+  const handleCreateContaBancaria = async (data: { nome: string; tipo: string; saldoInicial: number; banco: string; agencia: string; numeroConta: string; ativo: boolean }) => {
     try {
       await api.createContaBancaria(data);
       setContasBancarias(await api.getContasBancarias());
+      showAlert('success', 'Conta Cadastrada', 'A conta bancária foi cadastrada com sucesso!');
     } catch (err: any) {
       showAlert('error', 'Erro ao criar conta', err.message);
+    }
+  };
+
+  const handleUpdateContaBancaria = async (id: string, data: { nome: string; tipo: string; banco: string; agencia: string; numeroConta: string; ativo: boolean }) => {
+    try {
+      await api.updateContaBancaria(id, data);
+      setContasBancarias(await api.getContasBancarias());
+      showAlert('success', 'Conta Atualizada', 'A conta bancária foi atualizada com sucesso!');
+    } catch (err: any) {
+      showAlert('error', 'Erro ao atualizar conta', err.message);
     }
   };
 
@@ -719,7 +743,7 @@ export default function App() {
         </header>
 
         {/* Content Viewer viewport */}
-        <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto" id="saas_viewport">
+        <main className="flex-1 p-6 overflow-y-auto w-full" id="saas_viewport">
           
           {/* Dashboard Tático Banner */}
           {(() => {
@@ -812,11 +836,13 @@ export default function App() {
               products={products}
               services={services}
               employees={employees}
+              contasBancarias={contasBancarias}
               onAddClient={handleAddClient}
               onAddAsset={handleAddAsset}
               onAddProduct={handleAddProduct}
               onAddService={handleAddService}
               onAddEmployee={handleAddEmployee}
+              onAddContaBancaria={handleCreateContaBancaria}
               onDeleteClient={handleDeleteClient}
               onDeleteAsset={handleDeleteAsset}
               onDeleteProduct={handleDeleteProduct}
@@ -827,6 +853,7 @@ export default function App() {
               onUpdateProduct={handleUpdateProduct}
               onUpdateService={handleUpdateService}
               onUpdateEmployee={handleUpdateEmployee}
+              onUpdateContaBancaria={handleUpdateContaBancaria}
               workOrders={workOrders}
               budgets={budgets}
               purchases={purchases}
@@ -909,7 +936,7 @@ export default function App() {
               onReverseTransaction={handleReverseTransaction}
               onEditTransaction={handleEditTransaction}
               onParcelarTransaction={handleParcelarTransaction}
-              onCreateContaBancaria={handleCreateContaBancaria}
+              onUndoTransactionSource={handleUndoTransactionSource}
               onPrintFinancial={() => {
                 setPrintData({ type: "financial" });
                 setTimeout(() => window.print(), 100);

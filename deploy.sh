@@ -37,8 +37,8 @@ echo "[3/6] Publish do Backend (.NET)..."
 cd "$BACKEND_DIR"
 dotnet publish -c Release -o "$RUNTIME_API_DIR"
 
-echo "[4/6] Aplicando migrations do banco..."
-dotnet ef database update --context ServicoProDbContext --project "$BACKEND_DIR/ServicoPro.Api.csproj" --startup-project "$BACKEND_DIR/ServicoPro.Api.csproj"
+echo "[4/6] Aplicando migrations do banco (Pulado)..."
+# dotnet ef database update --context ServicoProDbContext --project "$BACKEND_DIR/ServicoPro.Api.csproj" --startup-project "$BACKEND_DIR/ServicoPro.Api.csproj"
 
 echo "[5/6] Reiniciando serviço da API..."
 systemctl restart "$SERVICE_NAME"

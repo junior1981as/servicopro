@@ -492,10 +492,25 @@ namespace ServicoPro.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Agencia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Banco")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTimeOffset>("CriadoEm")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroConta")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -805,6 +820,9 @@ namespace ServicoPro.Api.Migrations
                     b.Property<DateTimeOffset?>("DataPrevistaConclusao")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<decimal>("Desconto")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -971,12 +989,18 @@ namespace ServicoPro.Api.Migrations
                     b.Property<DateTimeOffset>("DataVencimento")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<decimal>("Desconto")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MetodoPagamento")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("NumeroParcela")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("OrdemServicoId")
                         .HasColumnType("uniqueidentifier");
@@ -985,6 +1009,9 @@ namespace ServicoPro.Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Tipo")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TotalParcelas")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Valor")

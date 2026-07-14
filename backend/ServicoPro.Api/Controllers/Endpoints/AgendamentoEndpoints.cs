@@ -48,8 +48,8 @@ public static class AgendamentoEndpoints
                 ClienteId = dto.ClientId,
                 AtivoId = dto.AssetId,
                 DataHora = dto.DateTime,
-                Descricao = dto.Description,
-                Status = Enum.TryParse<AgendamentoStatus>(dto.Status.Replace(" ", ""), out var s) ? s : AgendamentoStatus.Agendado,
+                Descricao = dto.Description ?? string.Empty,
+                Status = Enum.TryParse<AgendamentoStatus>(dto.Status?.Replace(" ", "") ?? "", out var s) ? s : AgendamentoStatus.Agendado,
                 OrdemServicoId = dto.WorkOrderId
             };
 
@@ -67,8 +67,8 @@ public static class AgendamentoEndpoints
             agendamento.ClienteId = dto.ClientId;
             agendamento.AtivoId = dto.AssetId;
             agendamento.DataHora = dto.DateTime;
-            agendamento.Descricao = dto.Description;
-            agendamento.Status = Enum.TryParse<AgendamentoStatus>(dto.Status.Replace(" ", ""), out var s) ? s : agendamento.Status;
+            agendamento.Descricao = dto.Description ?? string.Empty;
+            agendamento.Status = Enum.TryParse<AgendamentoStatus>(dto.Status?.Replace(" ", "") ?? "", out var s) ? s : agendamento.Status;
             agendamento.OrdemServicoId = dto.WorkOrderId;
 
             await db.SaveChangesAsync();

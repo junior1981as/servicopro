@@ -34,6 +34,7 @@ public class OrdemServico
     
     public decimal CustoTotal { get; set; }
     public decimal ValorTotal { get; set; }
+    public decimal Desconto { get; set; }
     public decimal PercentualMargem { get; set; }
     
     public string Diagnostico { get; set; } = string.Empty;

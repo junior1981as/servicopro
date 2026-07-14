@@ -1,59 +1,45 @@
-# Sistema / IDE
-.DS_Store
-Thumbs.db
-.vscode/
-.vs/
-.idea/
+# ambiente / IA
+.codex/
+.cursor/
+.claude/
+.gemini/
+.continue/
+.augment/
+.codebuddy/
+.factory/
+.kiro/
+.kilocode/
+.opencode/
+.qoder/
+.roo/
+.trae/
+.warp/
+.windsurf/
+.agents/
 
-# Frontend / Node
-node_modules/
+# build / runtime
 frontend/node_modules/
 frontend/dist/
-frontend/build/
-dist/
-build/
-
-# Backend / .NET
-bin/
-obj/
 backend/bin/
 backend/obj/
 backend/publish/
-**/publish/
-*.user
-*.suo
-
-# Logs / temporarios
+runtime/
+bin/
+obj/
 logs/
-*.log
-tmp/
-temp/
 
-# Segredos / ambiente
+# segredos / dados locais
+segredos/
 .env
 .env.*
-!.env.example
-segredos/
-appsettings.Production.json
-**/appsettings.Production.json
+dados/*.db
+dados/*.sqlite
+dados/*.sqlite3
 
-# Banco / runtime / dados locais
-dados/
-sqlserver/
-runtime/
-
-# Backups / pacotes
-*.bak
-*.backup
-*.tar
-*.tar.gz
-*.zip
-*.7z
-*.rar
-
-# Certificados / chaves
-*.pfx
-*.pem
-*.key
-*.crt
-*.cer
+# sistema
+*.log
+*.tmp
+*.user
+*.suo
+.DS_Store
+Thumbs.db

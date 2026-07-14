@@ -1,10 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 using ServicoPro.Api.Application.Interfaces;
 using ServicoPro.Api.Domain.Entities;
 
@@ -12,11 +13,8 @@ namespace ServicoPro.Api.Infrastructure.Data;
 
 public static class DatabaseSeeder
 {
-    public static async Task SeedAsync(WebApplication app)
+    public static async Task SeedAsync(IServiceProvider services)
     {
-        using var scope = app.Services.CreateScope();
-        var services = scope.ServiceProvider;
-
         // 1. Criar banco Master
         var masterDb = services.GetRequiredService<MasterDbContext>();
         await masterDb.Database.EnsureCreatedAsync();
@@ -111,6 +109,54 @@ public static class DatabaseSeeder
             }
         } catch (Exception ex) {
             Console.WriteLine("ERRO AO CRIAR TABELAS DO TENANT: " + ex.Message);
+        }
+
+        // Alter table Funcionarios to add missing columns
+        try {
+            var alterSql = @"
+                IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'Email' AND Object_ID = Object_ID(N'Funcionarios'))
+                BEGIN
+                    ALTER TABLE Funcionarios ADD Email nvarchar(max) NOT NULL DEFAULT '';
+                    ALTER TABLE Funcionarios ADD Cep nvarchar(max) NOT NULL DEFAULT '';
+                    ALTER TABLE Funcionarios ADD Rua nvarchar(max) NOT NULL DEFAULT '';
+                    ALTER TABLE Funcionarios ADD Numero nvarchar(max) NOT NULL DEFAULT '';
+                    ALTER TABLE Funcionarios ADD Bairro nvarchar(max) NOT NULL DEFAULT '';
+                    ALTER TABLE Funcionarios ADD Cidade nvarchar(max) NOT NULL DEFAULT '';
+                    ALTER TABLE Funcionarios ADD Estado nvarchar(max) NOT NULL DEFAULT '';
+                END";
+            await tenantDb.Database.ExecuteSqlRawAsync(alterSql);
+
+            // Create FormasPagamento
+            var sqlForma = @"
+                IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FormasPagamento]') AND type in (N'U'))
+                BEGIN
+                    CREATE TABLE [dbo].[FormasPagamento](
+                        [Id] [uniqueidentifier] NOT NULL,
+                        [TenantId] [nvarchar](max) NOT NULL,
+                        [Codigo] [nvarchar](max) NOT NULL,
+                        [Descricao] [nvarchar](max) NOT NULL,
+                        [Ativo] [bit] NOT NULL,
+                        [CriadoEm] [datetimeoffset](7) NOT NULL,
+                        CONSTRAINT [PK_FormasPagamento] PRIMARY KEY CLUSTERED ([Id] ASC)
+                    );
+                END
+                IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[FormasPagamentoParcela]') AND type in (N'U'))
+                BEGIN
+                    CREATE TABLE [dbo].[FormasPagamentoParcela](
+                        [Id] [uniqueidentifier] NOT NULL,
+                        [FormaPagamentoId] [uniqueidentifier] NOT NULL,
+                        [NumeroParcela] [int] NOT NULL,
+                        [DiasVencimento] [int] NOT NULL,
+                        [PorcentagemValor] [decimal](18, 2) NOT NULL,
+                        [TaxaOuDesconto] [decimal](18, 2) NOT NULL,
+                        CONSTRAINT [PK_FormasPagamentoParcela] PRIMARY KEY CLUSTERED ([Id] ASC),
+                        CONSTRAINT [FK_FormasPagamentoParcela_FormasPagamento_FormaPagamentoId] FOREIGN KEY([FormaPagamentoId]) REFERENCES [dbo].[FormasPagamento] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE INDEX [IX_FormasPagamentoParcela_FormaPagamentoId] ON [dbo].[FormasPagamentoParcela] ([FormaPagamentoId]);
+                END";
+            await tenantDb.Database.ExecuteSqlRawAsync(sqlForma);
+        } catch (Exception ex) {
+            Console.WriteLine("ERRO AO ALTERAR TABELA FUNCIONARIOS: " + ex.Message);
         }
 
         // 5. Injetar Usuário Admin removido pois estamos usando Dapper e tabelas 'usuarios' no MasterDB.

@@ -14,6 +14,8 @@ public class ServicoProDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Produto> Produtos { get; set; } = null!;
     public DbSet<Servico> Servicos { get; set; } = null!;
     public DbSet<Funcionario> Funcionarios { get; set; } = null!;
+    public DbSet<FormaPagamento> FormasPagamento { get; set; } = null!;
+    public DbSet<FormaPagamentoParcela> FormasPagamentoParcela { get; set; } = null!;
 
     public DbSet<OrdemServico> OrdensServico { get; set; } = null!;
     public DbSet<OSItemServico> OSItensServico { get; set; } = null!;

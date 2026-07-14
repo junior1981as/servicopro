@@ -31,6 +31,11 @@ public class ContaBancaria
     public ContaBancariaTipo Tipo { get; set; }
     public decimal SaldoAtual { get; set; }
     
+    public string Banco { get; set; } = string.Empty;
+    public string Agencia { get; set; } = string.Empty;
+    public string NumeroConta { get; set; } = string.Empty;
+    public bool Ativo { get; set; } = true;
+    
     public DateTimeOffset CriadoEm { get; set; } = DateTimeOffset.UtcNow;
 }
 
@@ -50,7 +55,12 @@ public class TransacaoFinanceira
     public ContaBancaria? ContaBancaria { get; set; }
     
     public string Descricao { get; set; } = string.Empty;
-    public decimal Valor { get; set; }
+    public decimal Valor { get; set; } // Valor Original
+    public decimal Desconto { get; set; } // Valor do Desconto Aplicado
+    public decimal ValorFinal => Valor - Desconto;
+    
+    public int? NumeroParcela { get; set; }
+    public int? TotalParcelas { get; set; }
     
     public DateTimeOffset DataVencimento { get; set; }
     public DateTimeOffset? DataPagamento { get; set; }

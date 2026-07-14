@@ -78,5 +78,37 @@ public class Funcionario
     public string Nome { get; set; } = string.Empty;
     public string Cargo { get; set; } = string.Empty;
     public string Especialidade { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Cep { get; set; } = string.Empty;
+    public string Rua { get; set; } = string.Empty;
+    public string Numero { get; set; } = string.Empty;
+    public string Bairro { get; set; } = string.Empty;
+    public string Cidade { get; set; } = string.Empty;
+    public string Estado { get; set; } = string.Empty;
     public bool Ativo { get; set; } = true;
+}
+
+public class FormaPagamento
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string TenantId { get; set; } = string.Empty;
+    public string Codigo { get; set; } = string.Empty;
+    public string Descricao { get; set; } = string.Empty;
+    
+    public List<FormaPagamentoParcela> Parcelas { get; set; } = new();
+    
+    public bool Ativo { get; set; } = true;
+    public DateTimeOffset CriadoEm { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public class FormaPagamentoParcela
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid FormaPagamentoId { get; set; }
+    public FormaPagamento FormaPagamento { get; set; } = null!;
+    
+    public int NumeroParcela { get; set; }
+    public int DiasVencimento { get; set; }
+    public decimal PorcentagemValor { get; set; }
+    public decimal TaxaOuDesconto { get; set; }
 }

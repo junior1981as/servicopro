@@ -157,7 +157,15 @@ class ApiService {
       tenantId: tid,
       nome: e.nome,
       cargo: e.cargo,
-      ativo: e.ativo
+      especialidade: e.especialidade,
+      ativo: e.ativo,
+      email: e.email,
+      cep: e.cep,
+      rua: e.rua,
+      numero: e.numero,
+      bairro: e.bairro,
+      cidade: e.cidade,
+      estado: e.estado
     }));
   }
 
@@ -187,7 +195,15 @@ class ApiService {
     const payload = {
       nome: employeeData.nome,
       cargo: employeeData.cargo,
-      ativo: employeeData.ativo ?? true
+      especialidade: employeeData.especialidade,
+      ativo: employeeData.ativo ?? true,
+      email: employeeData.email,
+      cep: employeeData.cep,
+      rua: employeeData.rua,
+      numero: employeeData.numero,
+      bairro: employeeData.bairro,
+      cidade: employeeData.cidade,
+      estado: employeeData.estado
     };
     return this.request<any>('/cadastros/funcionarios', {
       method: 'POST',
@@ -270,7 +286,15 @@ class ApiService {
     const payload = {
       nome: employeeData.nome,
       cargo: employeeData.cargo,
-      ativo: employeeData.ativo
+      especialidade: employeeData.especialidade,
+      ativo: employeeData.ativo,
+      email: employeeData.email,
+      cep: employeeData.cep,
+      rua: employeeData.rua,
+      numero: employeeData.numero,
+      bairro: employeeData.bairro,
+      cidade: employeeData.cidade,
+      estado: employeeData.estado
     };
     await this.request(`/cadastros/funcionarios/${employeeData.id}`, {
       method: 'PUT',
@@ -446,10 +470,10 @@ class ApiService {
     });
   }
 
-  async closeWorkOrder(id: string, diagnosis: string): Promise<void> {
+  async closeWorkOrder(id: string, diagnosis: string, discount: number = 0): Promise<void> {
     await this.request(`/os/${id}/fechar`, {
       method: 'POST',
-      body: JSON.stringify({ diagnosis })
+      body: JSON.stringify({ diagnosis, discount })
     });
   }
 
@@ -525,9 +549,16 @@ class ApiService {
     return this.request<any[]>('/financeiro/contas-bancarias');
   }
 
-  async createContaBancaria(data: { nome: string; tipo: string; saldoInicial: number }): Promise<void> {
+  async createContaBancaria(data: { nome: string; tipo: string; saldoInicial: number; banco: string; agencia: string; numeroConta: string; ativo: boolean }): Promise<void> {
     await this.request('/financeiro/contas-bancarias', {
       method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async updateContaBancaria(id: string, data: { nome: string; tipo: string; banco: string; agencia: string; numeroConta: string; ativo: boolean }): Promise<void> {
+    await this.request(`/financeiro/contas-bancarias/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(data)
     });
   }
@@ -539,7 +570,7 @@ class ApiService {
     });
   }
 
-  async editTransaction(id: string, data: { dueDate?: string; amount?: number; description?: string }): Promise<void> {
+  async editTransaction(id: string, data: { dueDate?: string; amount?: number; desconto?: number; description?: string }): Promise<void> {
     await this.request(`/financeiro/transacoes/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data)
@@ -555,6 +586,12 @@ class ApiService {
 
   async reverseTransaction(id: string): Promise<void> {
     await this.request(`/financeiro/transacoes/${id}/estornar`, {
+      method: 'POST'
+    });
+  }
+
+  async undoTransactionSource(id: string): Promise<void> {
+    await this.request(`/financeiro/transacoes/${id}/desfazer`, {
       method: 'POST'
     });
   }

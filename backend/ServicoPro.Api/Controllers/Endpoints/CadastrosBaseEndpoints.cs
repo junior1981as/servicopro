@@ -249,6 +249,13 @@ public static class CadastrosBaseEndpoints
             funcionario.Nome = funcionarioAtualizado.Nome;
             funcionario.Cargo = funcionarioAtualizado.Cargo;
             funcionario.Especialidade = funcionarioAtualizado.Especialidade;
+            funcionario.Email = funcionarioAtualizado.Email;
+            funcionario.Cep = funcionarioAtualizado.Cep;
+            funcionario.Rua = funcionarioAtualizado.Rua;
+            funcionario.Numero = funcionarioAtualizado.Numero;
+            funcionario.Bairro = funcionarioAtualizado.Bairro;
+            funcionario.Cidade = funcionarioAtualizado.Cidade;
+            funcionario.Estado = funcionarioAtualizado.Estado;
             funcionario.Ativo = funcionarioAtualizado.Ativo;
 
             await db.SaveChangesAsync();

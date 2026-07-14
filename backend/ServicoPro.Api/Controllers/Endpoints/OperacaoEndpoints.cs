@@ -92,8 +92,8 @@ public static class OperacaoEndpoints
                 Numero = $"OS-{DateTime.Now.Ticks.ToString().Substring(8)}",
                 ClienteId = dto.ClientId,
                 AtivoId = dto.AssetId,
-                Descricao = dto.Description,
-                Diagnostico = dto.Diagnosis,
+                Descricao = dto.Description ?? string.Empty,
+                Diagnostico = dto.Diagnosis ?? string.Empty,
                 KmAbertura = dto.OpeningKm?.ToString() ?? string.Empty,
                 ValorTotal = dto.TotalPrice,
                 CustoTotal = dto.TotalCost
@@ -157,6 +157,8 @@ public static class OperacaoEndpoints
                 {
                     os.Diagnostico = dto.Diagnosis;
                 }
+                
+                os.Desconto = dto.Discount;
 
                 // 1. Atualizar Status
                 os.AlterarStatus(OrdemStatus.Faturada);
@@ -181,6 +183,7 @@ public static class OperacaoEndpoints
                     OrdemServicoId = os.Id,
                     Descricao = $"Faturamento {osNumber} - {os.Cliente.Nome}",
                     Valor = os.ValorTotal,
+                    Desconto = os.Desconto,
                     DataVencimento = DateTimeOffset.UtcNow.AddDays(15), // 15 dias para vencimento
                     Status = TransacaoStatus.Pendente
                 };
@@ -517,6 +520,7 @@ public class OsItemDto
 public class FecharOsDto
 {
     public string Diagnosis { get; set; } = string.Empty;
+    public decimal Discount { get; set; }
 }
 
 public class UpdateOsDto

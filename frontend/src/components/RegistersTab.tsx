@@ -15,11 +15,13 @@ interface RegistersTabProps {
   products: Product[];
   services: Service[];
   employees: Employee[];
+  contasBancarias?: any[];
   onAddClient: (client: Client) => void;
   onAddAsset: (asset: Asset) => void;
   onAddProduct: (product: Product) => void;
   onAddService: (service: Service) => void;
   onAddEmployee: (employee: Employee) => void;
+  onAddContaBancaria?: (data: any) => void;
   onDeleteClient: (id: string) => void;
   onDeleteAsset: (id: string) => void;
   onDeleteProduct: (id: string) => void;
@@ -30,6 +32,7 @@ interface RegistersTabProps {
   onUpdateProduct?: (product: Product) => void;
   onUpdateService?: (service: Service) => void;
   onUpdateEmployee?: (employee: Employee) => void;
+  onUpdateContaBancaria?: (id: string, data: any) => void;
   workOrders?: WorkOrder[];
   budgets?: Budget[];
   purchases?: Purchase[];
@@ -43,11 +46,13 @@ export default function RegistersTab({
   products,
   services,
   employees,
+  contasBancarias = [],
   onAddClient,
   onAddAsset,
   onAddProduct,
   onAddService,
   onAddEmployee,
+  onAddContaBancaria,
   onDeleteClient,
   onDeleteAsset,
   onDeleteProduct,
@@ -58,12 +63,13 @@ export default function RegistersTab({
   onUpdateProduct,
   onUpdateService,
   onUpdateEmployee,
+  onUpdateContaBancaria,
   workOrders = [],
   budgets = [],
   purchases = [],
   onNavigateToOperation
 }: RegistersTabProps) {
-  const [subTab, setSubTab] = useState<"clients" | "assets" | "products" | "services" | "employees">("clients");
+  const [subTab, setSubTab] = useState<"clients" | "assets" | "products" | "services" | "employees" | "contas">("clients");
   const [search, setSearch] = useState("");
 
   const [cfops, setCfops] = useState<any[]>([]);
@@ -301,7 +307,24 @@ export default function RegistersTab({
   const [empRole, setEmpRole] = useState("");
   const [empSpecialty, setEmpSpecialty] = useState("");
   const [empActive, setEmpActive] = useState(true);
+  const [empEmail, setEmpEmail] = useState("");
+  const [empCep, setEmpCep] = useState("");
+  const [empRua, setEmpRua] = useState("");
+  const [empNumero, setEmpNumero] = useState("");
+  const [empBairro, setEmpBairro] = useState("");
+  const [empCidade, setEmpCidade] = useState("");
+  const [empEstado, setEmpEstado] = useState("");
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
+
+  // Conta Bancária Form
+  const [contaNome, setContaNome] = useState("");
+  const [contaTipo, setContaTipo] = useState("Corrente");
+  const [contaSaldo, setContaSaldo] = useState(0);
+  const [contaBanco, setContaBanco] = useState("");
+  const [contaAgencia, setContaAgencia] = useState("");
+  const [contaNumero, setContaNumero] = useState("");
+  const [contaAtivo, setContaAtivo] = useState(true);
+  const [editingContaId, setEditingContaId] = useState<string | null>(null);
 
   // Filter lists by search query (already filtered by tenant in parent, but double safe check)
   const filteredClients = clients.filter(c => 
@@ -515,7 +538,14 @@ export default function RegistersTab({
       nome: empName,
       cargo: empRole,
       especialidade: empSpecialty,
-      ativo: empActive
+      ativo: empActive,
+      email: empEmail,
+      cep: empCep,
+      rua: empRua,
+      numero: empNumero,
+      bairro: empBairro,
+      cidade: empCidade,
+      estado: empEstado
     };
     
     if (editingEmployeeId && onUpdateEmployee) {
@@ -526,7 +556,9 @@ export default function RegistersTab({
     
     setShowForm(false);
     // Reset
-    setEmpName(""); setEmpRole(""); setEmpSpecialty(""); setEmpActive(true); setEditingEmployeeId(null);
+    setEmpName(""); setEmpRole(""); setEmpSpecialty(""); setEmpActive(true); 
+    setEmpEmail(""); setEmpCep(""); setEmpRua(""); setEmpNumero(""); setEmpBairro(""); setEmpCidade(""); setEmpEstado("");
+    setEditingEmployeeId(null);
   };
 
   const handleEditEmployee = (e: Employee) => {
@@ -534,10 +566,59 @@ export default function RegistersTab({
     setEmpRole(e.cargo);
     setEmpSpecialty(e.especialidade || "");
     setEmpActive(e.ativo);
+    setEmpEmail(e.email || "");
+    setEmpCep(e.cep || "");
+    setEmpRua(e.rua || "");
+    setEmpNumero(e.numero || "");
+    setEmpBairro(e.bairro || "");
+    setEmpCidade(e.cidade || "");
+    setEmpEstado(e.estado || "");
     setEditingEmployeeId(e.id);
     setSubTab("employees");
     setShowForm(true);
   };
+
+  const handleSaveConta = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contaNome || !contaTipo) return;
+    
+    const data = {
+      nome: contaNome,
+      tipo: contaTipo,
+      saldoInicial: contaSaldo,
+      banco: contaBanco,
+      agencia: contaAgencia,
+      numeroConta: contaNumero,
+      ativo: contaAtivo
+    };
+
+    if (editingContaId && onUpdateContaBancaria) {
+      onUpdateContaBancaria(editingContaId, data);
+    } else if (onAddContaBancaria) {
+      onAddContaBancaria(data);
+    }
+    
+    setShowForm(false);
+    // Reset
+    setContaNome(""); setContaTipo("Corrente"); setContaSaldo(0); setContaBanco(""); setContaAgencia(""); setContaNumero(""); setContaAtivo(true); setEditingContaId(null);
+  };
+
+  const handleEditConta = (c: any) => {
+    setContaNome(c.nome);
+    setContaTipo(c.tipo);
+    setContaSaldo(c.saldoAtual);
+    setContaBanco(c.banco || "");
+    setContaAgencia(c.agencia || "");
+    setContaNumero(c.numeroConta || "");
+    setContaAtivo(c.ativo !== undefined ? c.ativo : true);
+    setEditingContaId(c.id);
+    setSubTab("contas");
+    setShowForm(true);
+  };
+
+  const filteredContas = contasBancarias.filter(c =>
+    c.nome.toLowerCase().includes(search.toLowerCase()) || (c.banco && c.banco.toLowerCase().includes(search.toLowerCase()))
+  );
 
   return (
     <div className="space-y-6" id="registers_tab_content">
@@ -594,6 +675,16 @@ export default function RegistersTab({
             <Wrench className="w-3.5 h-3.5 text-slate-500" />
             Técnicos ({employees.filter(e => e.tenantId === tenantId).length})
           </button>
+          <button
+            onClick={() => { setSubTab("contas"); setSearch(""); setShowForm(false); setEditingContaId(null); }}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-semibold font-sans transition-all ${
+              subTab === "contas" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"
+            }`}
+            id="subtab_contas_btn"
+          >
+            <div className="w-3.5 h-3.5 bg-slate-500 rounded-sm"></div>
+            Contas Bancárias ({contasBancarias.length})
+          </button>
         </div>
 
         <button
@@ -605,11 +696,13 @@ export default function RegistersTab({
               setEditingProductId(null);
               setEditingServiceId(null);
               setEditingEmployeeId(null);
+              setEditingContaId(null);
               setClientName(""); setClientDoc(""); setClientRg(""); setClientIe(""); setClientPartnerType("Cliente"); setClientIsActive(true); setClientPhone(""); setClientEmail(""); setClientCep(""); setClientRua(""); setClientNumero(""); setClientBairro(""); setClientCidade(""); setClientEstado("");
               setAssetName(""); setAssetBrand(""); setAssetModel(""); setAssetSerial(""); setAssetClientId(""); setAssetNotes("");
               setProdSku(""); setProdName(""); setProdCost(0); setProdPrice(0); setProdMin(1); setProdStock(1); setProdUnit("UN");
               setServName(""); setServCost(0); setServPrice(0); setServDuration(1.0);
               setEmpName(""); setEmpRole(""); setEmpSpecialty(""); setEmpActive(true);
+              setContaNome(""); setContaTipo("Corrente"); setContaSaldo(0); setContaBanco(""); setContaAgencia(""); setContaNumero(""); setContaAtivo(true);
             }
           }}
           className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold font-sans shadow-sm transition-colors"
@@ -641,8 +734,8 @@ export default function RegistersTab({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-sans font-semibold text-slate-900 flex items-center gap-2">
               <span className="w-1.5 h-4 bg-slate-900 rounded-full inline-block"></span>
-              {(editingClientId || editingAssetId || editingProductId || editingServiceId || editingEmployeeId) ? "Editar " : "Cadastrar Novo "} 
-              {subTab === "clients" ? "Cliente / Fornecedor" : subTab === "assets" ? "Ativo" : subTab === "products" ? "Produto" : subTab === "services" ? "Serviço" : "Técnico"}
+              {(editingClientId || editingAssetId || editingProductId || editingServiceId || editingEmployeeId || editingContaId) ? "Editar " : "Cadastrar Novo "} 
+              {subTab === "clients" ? "Cliente / Fornecedor" : subTab === "assets" ? "Ativo" : subTab === "products" ? "Produto" : subTab === "services" ? "Serviço" : subTab === "employees" ? "Técnico" : "Conta Bancária"}
             </h3>
             <div className="flex items-center gap-2">
               <button
@@ -915,6 +1008,34 @@ export default function RegistersTab({
                 <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Especialidade</label>
                 <input type="text" placeholder="ex: Motores, Eletricista, Suspensão" value={empSpecialty} onChange={e=>setEmpSpecialty(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
               </div>
+              <div className="md:col-span-1">
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">E-mail</label>
+                <input type="email" placeholder="ex: joao@oficina.com.br" value={empEmail} onChange={e=>setEmpEmail(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">CEP</label>
+                <input type="text" placeholder="ex: 00000-000" value={empCep} onChange={e=>setEmpCep(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Rua / Logradouro</label>
+                <input type="text" value={empRua} onChange={e=>setEmpRua(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Número</label>
+                <input type="text" value={empNumero} onChange={e=>setEmpNumero(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Bairro</label>
+                <input type="text" value={empBairro} onChange={e=>setEmpBairro(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Cidade</label>
+                <input type="text" value={empCidade} onChange={e=>setEmpCidade(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div className="md:col-span-1">
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Estado</label>
+                <input type="text" value={empEstado} onChange={e=>setEmpEstado(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
               <div className="md:col-span-2 flex items-center gap-2 mt-2">
                 <input type="checkbox" id="empActive" checked={empActive} onChange={e=>setEmpActive(e.target.checked)} className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-600" />
                 <label htmlFor="empActive" className="text-sm font-semibold text-slate-700">Técnico Ativo no Sistema</label>
@@ -923,6 +1044,56 @@ export default function RegistersTab({
                 <button type="button" onClick={()=>{setShowForm(false); setEditingEmployeeId(null);}} className="px-4 py-2 border border-slate-200 rounded text-xs font-semibold bg-white text-slate-700">Cancelar</button>
                 <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded text-xs font-semibold">
                   {editingEmployeeId ? "Salvar Alterações" : "Salvar Técnico"}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* CONTA BANCÁRIA FORM */}
+          {subTab === "contas" && (
+            <form onSubmit={handleSaveConta} onKeyDown={handleEnterAsTab} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Nome da Conta *</label>
+                <input required type="text" placeholder="ex: Caixa Principal, Bradesco PJ" value={contaNome} onChange={e=>setContaNome(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Tipo *</label>
+                <select required value={contaTipo} onChange={e=>setContaTipo(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs">
+                  <option value="Corrente">Conta Corrente</option>
+                  <option value="Poupanca">Conta Poupança</option>
+                  <option value="Caixa">Caixa Físico</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Banco</label>
+                <input type="text" placeholder="ex: Itaú, Bradesco, Nubank" value={contaBanco} onChange={e=>setContaBanco(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Agência</label>
+                <input type="text" placeholder="ex: 0001" value={contaAgencia} onChange={e=>setContaAgencia(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Conta Corrente</label>
+                <input type="text" placeholder="ex: 12345-6" value={contaNumero} onChange={e=>setContaNumero(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+              </div>
+              {!editingContaId && (
+                <div>
+                  <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Saldo Inicial (R$)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-slate-500 font-medium text-xs">R$</span>
+                    <input type="text" placeholder="0,00" value={formatCurrency(contaSaldo)} onChange={e=>setContaSaldo(parseCurrency(e.target.value))} className="w-full pl-8 p-2.5 bg-white border border-slate-200 rounded text-xs" />
+                  </div>
+                </div>
+              )}
+              <div className="md:col-span-2 flex items-center gap-2 mt-2">
+                <input type="checkbox" id="contaAtivo" checked={contaAtivo} onChange={e=>setContaAtivo(e.target.checked)} className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-600" />
+                <label htmlFor="contaAtivo" className="text-sm font-semibold text-slate-700">Conta Ativa / Inativa</label>
+              </div>
+              <div className="md:col-span-2 pt-2 border-t border-slate-200 flex justify-end gap-2">
+                <button type="button" onClick={()=>{setShowForm(false); setEditingContaId(null);}} className="px-4 py-2 border border-slate-200 rounded text-xs font-semibold bg-white text-slate-700">Cancelar</button>
+                <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded text-xs font-semibold">
+                  {editingContaId ? "Salvar Alterações" : "Salvar Conta"}
                 </button>
               </div>
             </form>
@@ -1252,6 +1423,71 @@ export default function RegistersTab({
             </table>
           </div>
         )}
+        </div>
+      )}
+
+      {/* CONTAS BANCARIAS LIST */}
+      {!showForm && subTab === "contas" && (
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm animate-fade-in">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs whitespace-nowrap">
+              <thead className="bg-slate-50 font-mono text-[10px] text-slate-500 uppercase">
+                <tr>
+                  <th className="px-4 py-3 border-b border-slate-200">Nome da Conta / Tipo</th>
+                  <th className="px-4 py-3 border-b border-slate-200">Dados Bancários</th>
+                  <th className="px-4 py-3 border-b border-slate-200 text-right">Saldo Atual</th>
+                  <th className="px-4 py-3 border-b border-slate-200 text-center">Status</th>
+                  <th className="px-4 py-3 border-b border-slate-200 w-16">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredContas.map((c) => (
+                  <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="font-semibold text-slate-800">{c.nome}</div>
+                      <div className="text-[10px] text-slate-500">{c.tipo}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {c.banco ? (
+                        <>
+                          <div className="font-semibold text-slate-700">{c.banco}</div>
+                          <div className="text-[10px] font-mono text-slate-500">Ag: {c.agencia || '-'} | CC: {c.numeroConta || '-'}</div>
+                        </>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 italic">--</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className={`font-mono font-medium ${c.saldoAtual < 0 ? 'text-rose-600' : c.saldoAtual > 0 ? 'text-emerald-600' : 'text-slate-600'}`}>
+                        R$ {c.saldoAtual.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${c.ativo !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                        {c.ativo !== false ? "ATIVO" : "INATIVO"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleEditConta(c)}
+                        className="p-1 text-slate-400 hover:text-indigo-600 transition-colors inline-block"
+                        title="Editar"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filteredContas.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-12 text-center text-slate-400">
+                      Nenhuma conta bancária registrada ainda.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

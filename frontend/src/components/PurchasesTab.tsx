@@ -17,6 +17,7 @@ interface PurchasesTabProps {
   onUpdatePurchase: (purchaseId: string, data: Partial<Purchase>) => void;
   onReceiveInvoice: (purchaseId: string, invoiceNumber: string, dueDate: string, totalAmount?: number, items?: any[]) => Promise<{ success: boolean; error?: string }>;
   onCancelPurchase: (purchaseId: string) => void;
+  onQuickAddProduct?: (product: Partial<Product>) => Promise<Product>;
 }
 
 export default function PurchasesTab({
@@ -27,7 +28,8 @@ export default function PurchasesTab({
   onAddPurchase,
   onUpdatePurchase,
   onReceiveInvoice,
-  onCancelPurchase
+  onCancelPurchase,
+  onQuickAddProduct
 }: PurchasesTabProps) {
   const [showForm, setShowForm] = useState(false);
   const [supplierId, setSupplierId] = useState("");
@@ -46,6 +48,13 @@ export default function PurchasesTab({
     d.setDate(d.getDate() + 30);
     return d.toISOString().split('T')[0];
   });
+
+  // Quick Add Product State
+  const [showQuickAddProduct, setShowQuickAddProduct] = useState(false);
+  const [newProductName, setNewProductName] = useState("");
+  const [newProductCost, setNewProductCost] = useState(0);
+  const [newProductUnit, setNewProductUnit] = useState("UN");
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
 
   // State for ConfirmModal
   const [cancelModalState, setCancelModalState] = useState<{ isOpen: boolean; purchaseId: string; message: string }>({
@@ -84,6 +93,34 @@ export default function PurchasesTab({
     setSelectedProductId("");
     setQty(1);
     setCostPrice(0);
+  };
+
+  const handleQuickAddProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onQuickAddProduct || !newProductName) return;
+    
+    setIsAddingProduct(true);
+    try {
+      const p = await onQuickAddProduct({
+        tenantId,
+        name: newProductName,
+        costPrice: newProductCost,
+        sellingPrice: newProductCost * 1.5, // estimate
+        unit: newProductUnit,
+        currentStock: 0,
+        minimumStock: 1
+      });
+      setSelectedProductId(p.id);
+      setCostPrice(p.costPrice);
+      setShowQuickAddProduct(false);
+      setNewProductName("");
+      setNewProductCost(0);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao cadastrar produto");
+    } finally {
+      setIsAddingProduct(false);
+    }
   };
 
   const handleRemoveProductFromPurchase = (idx: number) => {
@@ -286,16 +323,21 @@ export default function PurchasesTab({
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end mb-6">
                   <div className="md:col-span-5">
                     <label className="block text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">Produto do Catálogo</label>
-                    <select value={selectedProductId} onChange={e=>{
-                      setSelectedProductId(e.target.value);
-                      const p = products.find(item => item.id === e.target.value);
-                      if (p) setCostPrice(p.costPrice);
-                    }} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all">
-                      <option value="">Pesquisar produto...</option>
-                      {activeProducts.map(p => (
-                        <option key={p.id} value={p.id}>{p.name} (Estoque atual: {p.currentStock})</option>
-                      ))}
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select value={selectedProductId} onChange={e=>{
+                        setSelectedProductId(e.target.value);
+                        const p = products.find(item => item.id === e.target.value);
+                        if (p) setCostPrice(p.costPrice);
+                      }} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all">
+                        <option value="">Pesquisar produto...</option>
+                        {activeProducts.map(p => (
+                          <option key={p.id} value={p.id}>{p.name} (Estoque atual: {p.currentStock})</option>
+                        ))}
+                      </select>
+                      <button type="button" onClick={() => setShowQuickAddProduct(true)} className="p-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 rounded-lg transition-colors" title="Cadastrar Produto Rápido">
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                   <div className="md:col-span-3">
                     <label className="block text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">Custo Negociado (R$)</label>
@@ -695,6 +737,51 @@ export default function PurchasesTab({
         }}
         onCancel={() => setCancelModalState({ isOpen: false, purchaseId: "", message: "" })}
       />
+
+      {/* QUICK ADD PRODUCT MODAL */}
+      {showQuickAddProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-slate-200">
+            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+              <h3 className="font-sans font-bold text-slate-800 flex items-center gap-2">
+                <Package className="w-4 h-4 text-indigo-500" />
+                Cadastrar Novo Produto
+              </h3>
+              <button onClick={() => setShowQuickAddProduct(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleQuickAddProduct} className="p-6 space-y-4">
+              <div>
+                <label className="block text-[11px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">Nome do Produto *</label>
+                <input required type="text" value={newProductName} onChange={e=>setNewProductName(e.target.value)} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm" placeholder="ex: Filtro de Óleo" autoFocus />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">Custo (R$)</label>
+                  <input type="number" step="0.01" min="0" value={newProductCost} onChange={e=>setNewProductCost(Number(e.target.value))} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">Unidade</label>
+                  <select value={newProductUnit} onChange={e=>setNewProductUnit(e.target.value)} className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-white">
+                    <option value="UN">Unidade (UN)</option>
+                    <option value="CX">Caixa (CX)</option>
+                    <option value="KG">Quilo (KG)</option>
+                    <option value="L">Litro (L)</option>
+                    <option value="M">Metro (M)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
+                <button type="button" onClick={() => setShowQuickAddProduct(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-semibold">Cancelar</button>
+                <button type="submit" disabled={isAddingProduct} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-bold shadow-sm">
+                  {isAddingProduct ? "Salvando..." : "Salvar Produto"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

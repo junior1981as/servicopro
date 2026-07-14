@@ -93,7 +93,8 @@ var app = builder.Build();
 // Seed Database (Somente para o MVP)
 try 
 {
-    ServicoPro.Api.Infrastructure.Data.DatabaseSeeder.SeedAsync(app).Wait();
+    using var scope = app.Services.CreateScope();
+    ServicoPro.Api.Infrastructure.Data.DatabaseSeeder.SeedAsync(scope.ServiceProvider).Wait();
 }
 catch (Exception ex)
 {

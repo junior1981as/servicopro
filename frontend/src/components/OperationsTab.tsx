@@ -29,7 +29,7 @@ interface OperationsTabProps {
   onUpdateBudgetStatus: (id: string, status: "Rascunho" | "Enviado" | "Aprovado" | "Rejeitado" | "Cancelado", woId?: string) => void;
   onAddWorkOrder: (wo: WorkOrder) => any;
   onUpdateWorkOrder: (wo: WorkOrder) => Promise<{success: boolean, error?: string}>;
-  onCloseWorkOrder: (id: string) => Promise<{ success: boolean; error?: string }>;
+  onCloseWorkOrder: (id: string, discount: number) => Promise<{ success: boolean; error?: string }>;
   onCancelWorkOrder: (id: string) => void;
   onDeleteWorkOrder: (id: string) => void;
   onPrint: (doc: Budget | WorkOrder, type: "budget" | "workorder") => void;
@@ -108,6 +108,11 @@ export default function OperationsTab({
   const [selectedTechnicianId, setSelectedTechnicianId] = useState("");
   const [viewingBudgetId, setViewingBudgetId] = useState<string | null>(null);
   const [viewingScheduleId, setViewingScheduleId] = useState<string | null>(null);
+  
+  // OS Closing State
+  const [showCloseModal, setShowCloseModal] = useState<boolean>(false);
+  const [closingOsId, setClosingOsId] = useState<string | null>(null);
+  const [osDiscount, setOsDiscount] = useState<number>(0);
   const [selectedOsAddType, setSelectedOsAddType] = useState<"product" | "service">("product");
   const [selectedOsAddId, setSelectedOsAddId] = useState("");
   const [selectedOsAddQty, setSelectedOsAddQty] = useState(1);
@@ -604,11 +609,13 @@ Você aprova este orçamento para darmos andamento?`;
     }
   };
 
-  const handleCloseOSFlow = async (osId: string) => {
-    const res = await onCloseWorkOrder(osId);
+  const handleCloseOSFlow = async () => {
+    if (!closingOsId) return;
+    const res = await onCloseWorkOrder(closingOsId, osDiscount);
     if (res.success) {
-      showAlert('success', 'Ordem de Serviço Fechada', "Ordem de Serviço fechada com sucesso!\n\n1. O estoque físico das peças foi deduzido.\n2. Foi gerada uma conta a receber automaticamente.\n3. Foi enviada uma pré-nota fiscal eletrônica estruturada.");
+      showAlert('success', 'Ordem de Serviço Fechada', "Ordem de Serviço fechada com sucesso!\n\n1. O estoque físico das peças foi deduzido.\n2. Foi gerada uma conta a receber automaticamente com o desconto aplicado.\n3. Foi enviada uma pré-nota fiscal eletrônica estruturada.");
       setEditingOsId(null);
+      setShowCloseModal(false);
     } else {
       showAlert('error', 'Erro ao fechar OS', res.error || "Ocorreu um erro desconhecido.");
     }
@@ -1018,7 +1025,7 @@ Você aprova este orçamento para darmos andamento?`;
                 )}
                 {activeWO.status === "Concluída" && (
                   <button
-                    onClick={() => handleCloseOSFlow(activeWO.id)}
+                    onClick={() => { setClosingOsId(activeWO.id); setOsDiscount(0); setShowCloseModal(true); }}
                     className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold"
                   >
                     Faturamento (Fechamento)
@@ -1813,6 +1820,57 @@ Você aprova este orçamento para darmos andamento?`;
           cancelText="Cancelar"
         />
       )}
+      {/* Close OS Modal */}
+      {showCloseModal && closingOsId && (() => {
+        const os = workOrders.find(w => w.id === closingOsId);
+        if (!os) return null;
+        return (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md border border-slate-200 overflow-hidden animate-scale-up">
+              <div className="bg-emerald-600 p-4 text-white">
+                <h3 className="text-sm font-bold font-sans">Faturamento de Ordem de Serviço</h3>
+                <p className="text-xs opacity-90 font-mono mt-1">{os.clientName}</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-600 font-mono">Valor Total dos Itens:</span>
+                  <span className="font-bold font-mono">R$ {os.totalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div>
+                  <label className="block text-xs font-mono uppercase text-slate-500 mb-1">Desconto Comercial (R$)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={osDiscount}
+                    onChange={e => setOsDiscount(Number(e.target.value))}
+                    className="w-full p-2 border border-slate-300 rounded text-sm text-right font-mono focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                </div>
+                <div className="flex justify-between items-center text-base border-t border-slate-200 pt-4">
+                  <span className="text-slate-800 font-bold font-sans">Valor Final a Faturar:</span>
+                  <span className="font-bold font-mono text-emerald-600">R$ {Math.max(0, os.totalPrice - osDiscount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowCloseModal(false)}
+                  className="px-4 py-2 border border-slate-300 rounded text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCloseOSFlow}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded text-xs font-semibold hover:bg-emerald-700"
+                >
+                  Confirmar Faturamento
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
     </div>
   );
 }

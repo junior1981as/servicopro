@@ -104,6 +104,13 @@ export interface Employee {
   cargo: string;
   especialidade?: string;
   ativo: boolean;
+  email?: string;
+  cep?: string;
+  rua?: string;
+  numero?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
 }
 
 // --- Agenda & Operação ---
@@ -233,6 +240,10 @@ export interface ContaBancaria {
   nome: string;
   tipo: "Corrente" | "Poupanca" | "Caixa" | "Outro";
   saldoAtual: number;
+  banco: string;
+  agencia: string;
+  numeroConta: string;
+  ativo: boolean;
 }
 
 export type InvoiceType = "Receita_OS" | "Despesa_Compra" | "Ajuste";
@@ -246,6 +257,9 @@ export interface FinancialTransaction {
   sourceId?: string; // Link to OS ID or Purchase ID
   description: string;
   amount: number;
+  desconto?: number;
+  numeroParcela?: number;
+  totalParcelas?: number;
   dueDate: string;
   paymentDate?: string;
   status: TransactionStatus;
