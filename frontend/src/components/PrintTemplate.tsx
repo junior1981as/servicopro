@@ -6,9 +6,10 @@ interface PrintTemplateProps {
   documentData: Budget | WorkOrder | null;
   client: Client | undefined;
   asset: Asset | undefined;
+  activeTenant: any;
 }
 
-export default function PrintTemplate({ documentData, client, asset }: PrintTemplateProps) {
+export default function PrintTemplate({ documentData, client, asset, activeTenant }: PrintTemplateProps) {
   if (!documentData) return null;
 
   const isOS = "diagnosis" in documentData;
@@ -36,11 +37,15 @@ export default function PrintTemplate({ documentData, client, asset }: PrintTemp
         <div>
           <div className="flex items-center gap-2 mb-2">
             <ShieldCheck className="w-8 h-8 text-slate-900" />
-            <h1 className="text-2xl font-black tracking-tight uppercase">ServiçoPro Oficina Demo</h1>
+            <h1 className="text-2xl font-black tracking-tight uppercase">{activeTenant.name}</h1>
           </div>
-          <p className="text-xs text-slate-600">CNPJ: 00.000.000/0001-00</p>
-          <p className="text-xs text-slate-600 flex items-center gap-1 mt-1"><MapPin className="w-3 h-3"/> Av. Principal, 1000 - Centro, SP</p>
-          <p className="text-xs text-slate-600 flex items-center gap-1"><Phone className="w-3 h-3"/> (11) 99999-9999</p>
+          <p className="text-xs text-slate-600 font-bold uppercase">{activeTenant.razaoSocial || ""}</p>
+          <p className="text-xs text-slate-600 mt-1">CNPJ/CPF: {activeTenant.document || "Não informado"}</p>
+          <p className="text-xs text-slate-600 flex items-center gap-1 mt-1">
+            <MapPin className="w-3 h-3"/> 
+            {activeTenant.rua ? `${activeTenant.rua}, ${activeTenant.numero} - ${activeTenant.bairro}, ${activeTenant.cidade}-${activeTenant.estado}` : "Endereço não informado"}
+          </p>
+          <p className="text-xs text-slate-600 flex items-center gap-1 mt-0.5"><Phone className="w-3 h-3"/> {activeTenant.telefone || "Telefone não informado"}</p>
         </div>
         <div className="text-right">
           <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{title}</h2>

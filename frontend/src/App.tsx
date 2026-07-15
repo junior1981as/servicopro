@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  Tenant, Client, Asset, Product, Service, Schedule, Budget, WorkOrder, FinancialTransaction, CashLedger, Purchase, Employee, ContaBancaria 
+  Tenant, Client, Asset, Product, Service, Schedule, Budget, WorkOrder, FinancialTransaction, CashLedger, Purchase, Employee, ContaBancaria, FormaPagamento
 } from "./types";
 import { 
   INITIAL_TENANTS, INITIAL_CLIENTS, INITIAL_ASSETS, INITIAL_PRODUCTS, INITIAL_SERVICES, 
@@ -23,6 +23,7 @@ import FinancialTab from "./components/FinancialTab";
 import FiscalTab from "./components/FiscalTab";
 import ScheduleTab from "./components/ScheduleTab";
 import ArchitectPanel from "./components/ArchitectPanel";
+import SettingsTab from "./components/SettingsTab";
 import Login from "./components/Login";
 import { Layers, Database, ShieldCheck, Clock, RefreshCw, Star, Info, Hammer, CalendarDays } from "lucide-react";
 import { AlertModal, AlertType } from "./components/AlertModal";
@@ -36,7 +37,7 @@ export default function App() {
 
   // --- States ---
   const [activeTenant, setActiveTenant] = useState<Tenant>(INITIAL_TENANTS[0]);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "registers" | "operations" | "purchases" | "financial" | "fiscal" | "architect">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "registers" | "operations" | "purchases" | "financial" | "fiscal" | "architect" | "settings">("dashboard");
   const [operationToOpen, setOperationToOpen] = useState<{ type: 'budget' | 'workorder', id: string } | null>(null);
 
   const [clients, setClients] = useState<Client[]>([]);
@@ -51,6 +52,8 @@ export default function App() {
   const [transactions, setTransactions] = useState<FinancialTransaction[]>([]);
   const [cashLedger, setCashLedger] = useState<CashLedger[]>([]);
   const [contasBancarias, setContasBancarias] = useState<ContaBancaria[]>([]);
+  const [formasPagamento, setFormasPagamento] = useState<FormaPagamento[]>([]);
+  const [sysTenants, setSysTenants] = useState<Tenant[]>([INITIAL_TENANTS[0]]);
 
   const [alertState, setAlertState] = useState<{ isOpen: boolean; type: AlertType; title: string; message: string }>({
     isOpen: false,
@@ -129,7 +132,7 @@ export default function App() {
       const [
         apiClients, apiProducts, apiServices, apiAssets, apiEmployees,
         apiSchedules, apiBudgets, apiWorkOrders, apiPurchases,
-        apiTransactions, apiCashLedger, apiContas
+        apiTransactions, apiCashLedger, apiContas, apiFormas, apiTenants
       ] = await Promise.all([
         api.getClients(),
         api.getProducts(),
@@ -142,7 +145,9 @@ export default function App() {
         api.getPurchases(),
         api.getTransactions(),
         api.getCashLedger(),
-        api.getContasBancarias()
+        api.getContasBancarias(),
+        api.getFormasPagamento(),
+        api.getSaaSTenants().catch(() => []) // Fetch tenants, ignore error if unauthorized
       ]);
       setClients(apiClients);
       setProducts(apiProducts);
@@ -156,6 +161,35 @@ export default function App() {
       setTransactions(apiTransactions);
       setCashLedger(apiCashLedger);
       setContasBancarias(apiContas);
+      setFormasPagamento(apiFormas as FormaPagamento[]);
+      
+      const tenantsData = apiTenants || [];
+      if (tenantsData && tenantsData.length > 0) {
+        const mappedTenants = tenantsData.map((t: any) => ({
+          id: t.id,
+          name: t.nome,
+          segment: "Oficina",
+          document: t.documento || "",
+          razaoSocial: t.razaoSocial || "",
+          telefone: t.telefone || "",
+          cep: t.cep || "",
+          rua: t.rua || "",
+          numero: t.numero || "",
+          bairro: t.bairro || "",
+          cidade: t.cidade || "",
+          estado: t.estado || "",
+          inscricaoEstadual: t.inscricaoEstadual || "",
+          valorMensalidade: t.valorMensalidade || 0
+        }));
+        setSysTenants(mappedTenants);
+        
+        // Update activeTenant data if it matches one from DB
+        setActiveTenant(current => {
+          const matched = mappedTenants.find((m: any) => m.id === current.id);
+          return matched ? { ...current, ...matched } : current;
+        });
+      }
+
     } catch (err: any) {
       if (err.message !== 'Unauthorized') {
         console.error("Error fetching data:", err);
@@ -275,6 +309,42 @@ export default function App() {
     } catch (err: any) {
       console.error(err);
       showAlert('error', 'Erro ao deletar', err.message || "Não foi possível deletar este técnico.");
+    }
+  };
+
+  const handleAddFormaPagamento = async (fp: Partial<FormaPagamento>) => {
+    try {
+      await api.createFormaPagamento(fp);
+      const updated = await api.getFormasPagamento();
+      setFormasPagamento(updated);
+      showAlert('success', 'Sucesso', "Forma de pagamento criada.");
+    } catch (err: any) {
+      console.error(err);
+      showAlert('error', 'Erro', err.message || "Erro ao salvar forma de pagamento.");
+    }
+  };
+
+  const handleUpdateFormaPagamento = async (fp: FormaPagamento) => {
+    try {
+      await api.updateFormaPagamento(fp);
+      const updated = await api.getFormasPagamento();
+      setFormasPagamento(updated);
+      showAlert('success', 'Sucesso', "Forma de pagamento atualizada.");
+    } catch (err: any) {
+      console.error(err);
+      showAlert('error', 'Erro', err.message || "Erro ao atualizar forma de pagamento.");
+    }
+  };
+
+  const handleDeleteFormaPagamento = async (id: string) => {
+    try {
+      await api.deleteFormaPagamento(id);
+      const updated = await api.getFormasPagamento();
+      setFormasPagamento(updated);
+      showAlert('success', 'Sucesso', "Forma de pagamento excluída.");
+    } catch (err: any) {
+      console.error(err);
+      showAlert('error', 'Erro', err.message || "Erro ao excluir forma de pagamento.");
     }
   };
 
@@ -561,9 +631,9 @@ export default function App() {
   };
 
   // --- Core Business Logic: Settling accounts and logging Cash Ledger ---
-  const handlePayTransaction = async (id: string, payMethod: string, contaId: string) => {
+  const handlePayTransaction = async (id: string, payMethod: string, contaId: string, paymentDate?: string) => {
     try {
-      await api.payTransaction(id, payMethod, contaId);
+      await api.payTransaction(id, payMethod, contaId, paymentDate);
       setTransactions(await api.getTransactions());
       setCashLedger(await api.getCashLedger());
     } catch (err: any) {
@@ -591,9 +661,9 @@ export default function App() {
     }
   };
 
-  const handleParcelarTransaction = async (id: string, parcelas: number) => {
+  const handleParcelarTransaction = async (id: string, formaPagamentoId: string | null, parcelas?: number) => {
     try {
-      await api.parcelarTransaction(id, parcelas);
+      await api.parcelarTransaction(id, formaPagamentoId, parcelas);
       setTransactions(await api.getTransactions());
     } catch (err: any) {
       showAlert('error', 'Erro ao parcelar', err.message);
@@ -669,7 +739,7 @@ export default function App() {
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         activeTenant={activeTenant} 
-        tenants={INITIAL_TENANTS}
+        tenants={sysTenants.length > 0 ? sysTenants : INITIAL_TENANTS}
         setActiveTenant={(t) => {
           setActiveTenant(t);
           // Auto route back to dashboard on change of context
@@ -837,23 +907,27 @@ export default function App() {
               services={services}
               employees={employees}
               contasBancarias={contasBancarias}
+              formasPagamento={formasPagamento}
               onAddClient={handleAddClient}
               onAddAsset={handleAddAsset}
               onAddProduct={handleAddProduct}
               onAddService={handleAddService}
               onAddEmployee={handleAddEmployee}
               onAddContaBancaria={handleCreateContaBancaria}
+              onAddFormaPagamento={handleAddFormaPagamento}
               onDeleteClient={handleDeleteClient}
               onDeleteAsset={handleDeleteAsset}
               onDeleteProduct={handleDeleteProduct}
               onDeleteService={handleDeleteService}
               onDeleteEmployee={handleDeleteEmployee}
+              onDeleteFormaPagamento={handleDeleteFormaPagamento}
               onUpdateClient={handleUpdateClient}
               onUpdateAsset={handleUpdateAsset}
               onUpdateProduct={handleUpdateProduct}
               onUpdateService={handleUpdateService}
               onUpdateEmployee={handleUpdateEmployee}
               onUpdateContaBancaria={handleUpdateContaBancaria}
+              onUpdateFormaPagamento={handleUpdateFormaPagamento}
               workOrders={workOrders}
               budgets={budgets}
               purchases={purchases}
@@ -932,6 +1006,7 @@ export default function App() {
               transactions={transactions} 
               cashLedger={cashLedger}
               contas={contasBancarias}
+              formasPagamento={formasPagamento}
               onPayTransaction={handlePayTransaction}
               onReverseTransaction={handleReverseTransaction}
               onEditTransaction={handleEditTransaction}
@@ -953,6 +1028,10 @@ export default function App() {
 
           {activeTab === "architect" && (
             <ArchitectPanel />
+          )}
+
+          {activeTab === 'settings' && (
+            <SettingsTab showAlert={showAlert} />
           )}
 
         </main>
@@ -984,6 +1063,7 @@ export default function App() {
         documentData={printData.document}
         client={clients.find(c => c.id === printData.document!.clientId)}
         asset={assets.find(a => a.id === printData.document!.assetId)}
+        activeTenant={activeTenant}
       />
     )}
     {printData && printData.type === "financial" && (
@@ -991,6 +1071,7 @@ export default function App() {
         tenantId={activeTenant.id}
         transactions={transactions}
         cashLedger={cashLedger}
+        activeTenant={activeTenant}
       />
     )}
     </>

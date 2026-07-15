@@ -10,6 +10,16 @@ export interface Tenant {
   document: string; // CNPJ or CPF
   segment: string; // e.g., "Mecânica Automotiva", "Refrigeração", "Assistência Técnica"
   dbHost: string; // Dynamic connection metadata
+  razaoSocial?: string;
+  telefone?: string;
+  cep?: string;
+  rua?: string;
+  numero?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  inscricaoEstadual?: string;
+  valorMensalidade?: number;
 }
 
 // --- Cadastros Mestres ---
@@ -22,6 +32,7 @@ export interface Client {
   rg?: string;
   ie?: string; // Inscrição Estadual
   partnerType: "Cliente" | "Fornecedor" | "Ambos";
+  formaPagamentoPadraoId?: string;
   isActive: boolean;
   phone: string;
   email: string;
@@ -111,6 +122,25 @@ export interface Employee {
   bairro?: string;
   cidade?: string;
   estado?: string;
+}
+
+export interface FormaPagamentoParcela {
+  id?: string;
+  formaPagamentoId?: string;
+  numeroParcela: number;
+  diasVencimento: number;
+  porcentagemValor: number;
+  taxaOuDesconto: number;
+}
+
+export interface FormaPagamento {
+  id: string;
+  tenantId: string;
+  codigo: string;
+  descricao: string;
+  ativo: boolean;
+  parcelas: FormaPagamentoParcela[];
+  criadoEm?: string;
 }
 
 // --- Agenda & Operação ---

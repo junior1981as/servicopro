@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { FinancialTransaction, CashLedger, ContaBancaria } from "../types";
+import { FinancialTransaction, CashLedger, ContaBancaria, FormaPagamento } from "../types";
 import { DollarSign, Wallet, ArrowUpRight, ArrowDownRight, Check, CheckCircle2, TrendingUp, Filter, BarChart3, Banknote, Calendar, Activity, Pencil, SplitSquareHorizontal, Plus, Building2, X, Landmark, RefreshCw, Undo2 } from "lucide-react";
 import { AlertModal, AlertType } from "./AlertModal";
 import { ConfirmModal } from "./ConfirmModal";
@@ -14,10 +14,11 @@ interface FinancialTabProps {
   transactions: FinancialTransaction[];
   cashLedger: CashLedger[];
   contas: ContaBancaria[];
-  onPayTransaction: (id: string, paymentMethod: string, contaBancariaId: string) => void;
+  formasPagamento: FormaPagamento[];
+  onPayTransaction: (id: string, paymentMethod: string, contaBancariaId: string, paymentDate?: string) => void;
   onReverseTransaction: (id: string) => void;
   onEditTransaction: (id: string, data: { dueDate?: string; amount?: number; desconto?: number; description?: string }) => void;
-  onParcelarTransaction: (id: string, parcelas: number) => void;
+  onParcelarTransaction: (id: string, formaPagamentoId: string | null, parcelas?: number) => void;
   onUndoTransactionSource: (id: string) => void;
   onPrintFinancial?: () => void;
 }
@@ -27,6 +28,7 @@ export default function FinancialTab({
   transactions,
   cashLedger,
   contas,
+  formasPagamento,
   onPayTransaction,
   onReverseTransaction,
   onEditTransaction,
@@ -36,7 +38,14 @@ export default function FinancialTab({
 }: FinancialTabProps) {
   const [filterType, setFilterType] = useState<"all" | "receita" | "despesa">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "Pendente" | "Pago">("all");
+  const [filterContaId, setFilterContaId] = useState<string>("all");
+  
+  const todayDate = new Date();
+  const thirtyDaysAgo = new Date(todayDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+  const [filterStartDate, setFilterStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
+  const [filterEndDate, setFilterEndDate] = useState(todayDate.toISOString().split('T')[0]);
   const [paymentMethod, setPaymentMethod] = useState("PIX");
+  const [paymentDate, setPaymentDate] = useState(todayDate.toISOString().split('T')[0]);
   const [selectedContaId, setSelectedContaId] = useState<string>("");
   const [payingTransId, setPayingTransId] = useState<string | null>(null);
   const [reversingTransId, setReversingTransId] = useState<string | null>(null);
@@ -46,7 +55,9 @@ export default function FinancialTab({
   const [editDesc, setEditDesc] = useState("");
   const [editDesconto, setEditDesconto] = useState("");
   const [parcelingTransId, setParcelingTransId] = useState<string | null>(null);
+  const [parcelingMode, setParcelingMode] = useState<"manual" | "forma">("forma");
   const [numParcelas, setNumParcelas] = useState(2);
+  const [selectedFormaId, setSelectedFormaId] = useState("");
 
   const [alertConfig, setAlertConfig] = useState<{
     isOpen: boolean;
@@ -63,14 +74,33 @@ export default function FinancialTab({
     if (t.tenantId !== tenantId) return false;
     if (filterType !== "all" && t.type !== filterType) return false;
     if (filterStatus !== "all" && t.status !== filterStatus) return false;
+    if (filterContaId !== "all" && t.contaBancariaId !== filterContaId) return false;
+
+    // Use paymentDate if paid, otherwise dueDate or createdAt
+    const referenceDate = (t.status === 'Pago' && t.paymentDate) ? t.paymentDate : (t.dueDate || t.createdAt || "");
+    const d = referenceDate.split('T')[0];
+    if (d && d < filterStartDate) return false;
+    if (d && d > filterEndDate) return false;
+
     return true;
   }).sort((a, b) => {
-    const dateA = new Date(a.dueDate || a.createdAt || 0).getTime();
-    const dateB = new Date(b.dueDate || b.createdAt || 0).getTime();
+    const refA = (a.status === 'Pago' && a.paymentDate) ? a.paymentDate : (a.dueDate || a.createdAt || "");
+    const refB = (b.status === 'Pago' && b.paymentDate) ? b.paymentDate : (b.dueDate || b.createdAt || "");
+    const dateA = new Date(refA || 0).getTime();
+    const dateB = new Date(refB || 0).getTime();
     return dateB - dateA;
   });
 
-  const tenantLedgers = cashLedger.filter(l => l.tenantId === tenantId).sort((a,b) => new Date(b.dateTimeRecorded).getTime() - new Date(a.dateTimeRecorded).getTime());
+  const tenantLedgers = cashLedger.filter(l => {
+    if (l.tenantId !== tenantId) return false;
+    if (filterContaId !== "all" && l.contaBancariaId !== filterContaId) return false;
+    
+    const d = (l.dateTimeRecorded || "").split('T')[0];
+    if (d && d < filterStartDate) return false;
+    if (d && d > filterEndDate) return false;
+
+    return true;
+  }).sort((a,b) => new Date(b.dateTimeRecorded).getTime() - new Date(a.dateTimeRecorded).getTime());
 
   // Computations
   const totalReceivablesPendente = transactions
@@ -387,13 +417,17 @@ export default function FinancialTab({
             {/* Filters Bar */}
             <div className="p-3 border-b border-slate-100 flex items-center justify-between gap-2">
                <div className="flex items-center gap-2">
-                 <div className="flex items-center gap-2 border border-slate-200 px-3 py-1.5 rounded-md text-[11px] font-medium text-slate-600 bg-white">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>10/06/2026 - 13/07/2026</span>
+                 <div className="flex items-center gap-2">
+                   <div className="flex items-center gap-1 border border-slate-200 px-2 py-1 rounded-md text-[11px] font-medium text-slate-600 bg-white">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <input type="date" value={filterStartDate} onChange={e=>setFilterStartDate(e.target.value)} className="bg-transparent border-none outline-none text-slate-600 focus:ring-0 p-0" />
+                      <span className="text-slate-400">até</span>
+                      <input type="date" value={filterEndDate} onChange={e=>setFilterEndDate(e.target.value)} className="bg-transparent border-none outline-none text-slate-600 focus:ring-0 p-0" />
+                   </div>
                  </div>
-                 <select className="border border-slate-200 px-3 py-1.5 rounded-md text-[11px] font-medium text-slate-600 focus:outline-none bg-white">
-                   <option>Todas as contas</option>
-                   {contas.map(c => <option key={c.id}>{c.nome}</option>)}
+                 <select value={filterContaId} onChange={e=>setFilterContaId(e.target.value)} className="border border-slate-200 px-3 py-1.5 rounded-md text-[11px] font-medium text-slate-600 focus:outline-none bg-white">
+                   <option value="all">Todas as contas</option>
+                   {contas.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
                  </select>
                  <select value={filterType} onChange={e=>setFilterType(e.target.value as any)} className="border border-slate-200 px-3 py-1.5 rounded-md text-[11px] font-medium text-slate-600 focus:outline-none bg-white">
                    <option value="all">Todos os tipos</option>
@@ -411,50 +445,57 @@ export default function FinancialTab({
               <table className="w-full text-left text-[11px]">
                 <thead className="text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 bg-white whitespace-nowrap">
                   <tr>
-                    <th className="px-3 py-3 font-semibold w-[80px]">DATA</th>
-                    <th className="px-3 py-3 font-semibold w-full">DESCRIÇÃO</th>
-                    <th className="px-3 py-3 font-semibold w-[80px]">TIPO</th>
-                    <th className="px-3 py-3 font-semibold w-[120px]">CATEGORIA</th>
-                    <th className="px-3 py-3 font-semibold w-[140px]">CONTA</th>
-                    <th className="px-3 py-3 font-semibold text-right w-[100px]">VALOR</th>
-                    <th className="px-3 py-3 font-semibold text-center w-[90px]">STATUS</th>
-                    <th className="px-3 py-3 w-[40px]"></th>
+                    <th className="px-2 py-3 font-semibold w-[80px]">DATA</th>
+                    <th className="px-2 py-3 font-semibold w-full">DESCRIÇÃO</th>
+                    <th className="px-2 py-3 font-semibold w-[80px]">TIPO</th>
+                    <th className="px-2 py-3 font-semibold w-[120px]">CATEGORIA</th>
+                    <th className="px-2 py-3 font-semibold w-[140px]">CONTA</th>
+                    <th className="px-2 py-3 font-semibold text-right w-[100px]">VALOR</th>
+                    <th className="px-2 py-3 font-semibold text-center w-[90px]">STATUS</th>
+                    <th className="px-2 py-3 w-[40px]"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {tenantTransactions.map(t => (
                     <tr key={t.id} className="hover:bg-slate-50 transition-colors group cursor-pointer" onClick={() => {
-                        if (t.status === 'Pendente') setPayingTransId(t.id);
-                        else { setEditingTrans(t); setEditDueDate(t.dueDate ? t.dueDate.substring(0,10) : ""); setEditAmount(String(t.amount)); setEditDesc(t.description); setEditDesconto(String(t.desconto || 0)); }
+                        setEditingTrans(t); 
+                        setEditDueDate(t.dueDate ? t.dueDate.substring(0,10) : ""); 
+                        setEditAmount(t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); 
+                        setEditDesc(t.description); 
+                        setEditDesconto((t.desconto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                       }}>
-                      <td className="px-3 py-3 text-slate-500 whitespace-nowrap">{t.dueDate ? new Date(t.dueDate).toLocaleDateString('pt-BR') : '--'}</td>
-                      <td className="px-3 py-3 min-w-[200px]">
+                      <td className="px-2 py-3 text-slate-500 whitespace-nowrap">
+                        {t.status === 'Pago' && t.paymentDate 
+                           ? new Date(t.paymentDate).toLocaleDateString('pt-BR') 
+                           : (t.dueDate ? new Date(t.dueDate).toLocaleDateString('pt-BR') : '--')}
+                      </td>
+                      <td className="px-2 py-3 min-w-[200px]">
                         <div className="text-slate-800 whitespace-normal line-clamp-2">{t.description}</div>
                         <div className="text-[10px] text-slate-400 mt-0.5 truncate max-w-[300px] xl:max-w-[400px]">{t.sourceId || 'Lançamento manual'}</div>
                       </td>
-                      <td className="px-3 py-3 whitespace-nowrap">
+                      <td className="px-2 py-3 whitespace-nowrap">
                         <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${t.type === 'receita' ? 'bg-emerald-50 text-[#10b981]' : 'bg-rose-50 text-[#f43f5e]'}`}>
                           {t.type === 'receita' ? 'RECEITA' : 'DESPESA'}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-slate-500 whitespace-nowrap">
+                      <td className="px-2 py-3 text-slate-500 whitespace-nowrap">
                         {t.category}
                       </td>
-                      <td className="px-3 py-3 text-slate-500 whitespace-nowrap truncate max-w-[140px]">
+                      <td className="px-2 py-3 text-slate-500 whitespace-nowrap truncate max-w-[140px]">
                          {t.contaBancariaId ? contas.find(c => c.id === t.contaBancariaId)?.nome : '---'}
                       </td>
-                      <td className="px-3 py-3 text-right whitespace-nowrap">
+                      <td className="px-2 py-3 text-right whitespace-nowrap">
                         <span className={`font-sans font-bold text-[12px] ${t.type === 'receita' ? 'text-[#10b981]' : 'text-[#f43f5e]'}`}>
                           {t.type === 'receita' ? '' : '- '}R$ {Math.max(0, t.amount - (t.desconto || 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                      <td className="px-2 py-3 text-center whitespace-nowrap">
                         <span className={`inline-flex items-center justify-center gap-1 text-[10px] font-medium ${t.status === 'Pago' ? 'text-[#10b981]' : t.status === 'Pendente' ? 'text-amber-500' : 'text-slate-400'}`}>
                           {t.status === 'Pago' ? <CheckCircle2 className="w-3.5 h-3.5" /> : t.status === 'Pendente' ? <Activity className="w-3.5 h-3.5" /> : null}
                           {t.status}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-right whitespace-nowrap">
+                      <td className="px-2 py-3 text-right whitespace-nowrap">
                          <span className="text-slate-300 group-hover:text-slate-500">›</span>
                       </td>
                     </tr>
@@ -588,6 +629,80 @@ export default function FinancialTab({
         />
       )}
 
+      {/* Payment Modal */}
+      {payingTransId && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-in">
+            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Liquidar Título
+              </h3>
+              <button onClick={() => setPayingTransId(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded-full transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Conta de Destino/Origem</label>
+                <select 
+                  value={selectedContaId} 
+                  onChange={e => setSelectedContaId(e.target.value)} 
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                >
+                  <option value="">Selecione uma conta...</option>
+                  {contas.filter(c => c.ativo !== false).map(c => (
+                    <option key={c.id} value={c.id}>{c.nome} ({c.banco || 'Caixa'})</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Data do Pagamento</label>
+                <input 
+                  type="date"
+                  value={paymentDate}
+                  onChange={e => setPaymentDate(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Forma de Pagamento</label>
+                <select 
+                  value={paymentMethod} 
+                  onChange={e => setPaymentMethod(e.target.value)} 
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                >
+                  <option value="PIX">PIX</option>
+                  <option value="Boleto">Boleto</option>
+                  <option value="Cartão Crédito">Cartão de Crédito</option>
+                  <option value="Cartão Débito">Cartão de Débito</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Transferência">Transferência Bancária</option>
+                </select>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+              <button onClick={() => setPayingTransId(null)} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-semibold transition-colors">
+                Cancelar
+              </button>
+              <button 
+                onClick={() => {
+                  if (!selectedContaId) {
+                    showAlert("error", "Erro de Validação", "Por favor, selecione uma conta bancária para a liquidação.");
+                    return;
+                  }
+                  onPayTransaction(payingTransId, paymentMethod, selectedContaId, paymentDate);
+                  setPayingTransId(null);
+                  showAlert("success", "Título Liquidado", "O pagamento foi registrado e o fluxo de caixa atualizado.");
+                }} 
+                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" /> Confirmar Pagamento
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {reversingTransId && (
         <ConfirmModal
           isOpen={true}
@@ -632,11 +747,29 @@ export default function FinancialTab({
                 </div>
                 <div>
                   <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Valor (R$)</label>
-                  <input type="number" step="0.01" disabled={editingTrans.status === 'Pago'} value={editAmount} onChange={e => setEditAmount(e.target.value)} className={`w-full p-2.5 border rounded-lg text-sm font-mono ${editingTrans.status === 'Pago' ? 'bg-slate-50 border-transparent text-slate-500 cursor-not-allowed' : 'bg-white border-slate-200'}`} />
+                  <input 
+                    type="text" 
+                    disabled={editingTrans.status === 'Pago'} 
+                    value={editAmount} 
+                    onChange={e => {
+                      const raw = e.target.value.replace(/\D/g, '');
+                      setEditAmount(raw ? (parseInt(raw) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0,00");
+                    }} 
+                    className={`w-full p-2.5 border rounded-lg text-sm font-mono ${editingTrans.status === 'Pago' ? 'bg-slate-50 border-transparent text-slate-500 cursor-not-allowed' : 'bg-white border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'}`} 
+                  />
                 </div>
                 <div>
                   <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desconto (R$)</label>
-                  <input type="number" step="0.01" disabled={editingTrans.status === 'Pago'} value={editDesconto} onChange={e => setEditDesconto(e.target.value)} className={`w-full p-2.5 border rounded-lg text-sm font-mono ${editingTrans.status === 'Pago' ? 'bg-slate-50 border-transparent text-slate-500 cursor-not-allowed' : 'bg-white border-slate-200'}`} />
+                  <input 
+                    type="text" 
+                    disabled={editingTrans.status === 'Pago'} 
+                    value={editDesconto} 
+                    onChange={e => {
+                      const raw = e.target.value.replace(/\D/g, '');
+                      setEditDesconto(raw ? (parseInt(raw) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0,00");
+                    }} 
+                    className={`w-full p-2.5 border rounded-lg text-sm font-mono ${editingTrans.status === 'Pago' ? 'bg-slate-50 border-transparent text-slate-500 cursor-not-allowed' : 'bg-white border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'}`} 
+                  />
                 </div>
               </div>
             </div>
@@ -647,6 +780,7 @@ export default function FinancialTab({
                  </button>
               ) : (
                  <div className="flex gap-2">
+                    <button onClick={() => { setPayingTransId(editingTrans.id); setEditingTrans(null); }} className="px-3 py-2 text-emerald-600 hover:bg-emerald-50 text-sm font-semibold rounded-lg flex items-center gap-2 border border-transparent hover:border-emerald-200"><CheckCircle2 className="w-4 h-4" /> Liquidar</button>
                     <button onClick={() => setParcelingTransId(editingTrans.id)} className="px-3 py-2 text-purple-600 hover:bg-purple-50 text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors border border-transparent hover:border-purple-200"><SplitSquareHorizontal className="w-4 h-4" /> Parcelar</button>
                  </div>
               )}
@@ -654,7 +788,13 @@ export default function FinancialTab({
               <div className="flex gap-3">
                  <button onClick={() => setEditingTrans(null)} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-semibold">{editingTrans.status === 'Pago' ? 'Fechar' : 'Cancelar'}</button>
                  {editingTrans.status !== 'Pago' && (
-                   <button onClick={() => { onEditTransaction(editingTrans.id, { dueDate: editDueDate || undefined, amount: editAmount ? parseFloat(editAmount) : undefined, desconto: editDesconto ? parseFloat(editDesconto) : undefined, description: editDesc || undefined }); setEditingTrans(null); showAlert("success", "Título Atualizado", "Os dados do título foram salvos com sucesso."); }} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all">Salvar</button>
+                   <button onClick={() => { 
+                     const parsedAmount = editAmount ? parseFloat(editAmount.replace(/\./g, '').replace(',', '.')) : undefined;
+                     const parsedDesconto = editDesconto ? parseFloat(editDesconto.replace(/\./g, '').replace(',', '.')) : undefined;
+                     onEditTransaction(editingTrans.id, { dueDate: editDueDate || undefined, amount: parsedAmount, desconto: parsedDesconto, description: editDesc || undefined }); 
+                     setEditingTrans(null); 
+                     showAlert("success", "Título Atualizado", "Os dados do título foram salvos com sucesso."); 
+                   }} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all">Salvar</button>
                  )}
               </div>
             </div>
@@ -671,15 +811,47 @@ export default function FinancialTab({
               <button onClick={() => setParcelingTransId(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded-full"><X className="w-4 h-4" /></button>
             </div>
             <div className="p-6 space-y-4">
-              <p className="text-xs text-slate-500">O título será dividido em parcelas iguais com vencimentos mensais a partir da data original. O título original será removido.</p>
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Número de Parcelas</label>
-                <input type="number" min={2} max={60} value={numParcelas} onChange={e => setNumParcelas(parseInt(e.target.value) || 2)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono" />
+              <p className="text-xs text-slate-500 mb-2">O título original será removido e substituído pelas novas parcelas.</p>
+              
+              <div className="flex gap-4 mb-2">
+                <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                  <input type="radio" checked={parcelingMode === 'forma'} onChange={() => setParcelingMode('forma')} className="accent-purple-600" />
+                  Usar Forma de Pagamento
+                </label>
+                <label className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                  <input type="radio" checked={parcelingMode === 'manual'} onChange={() => setParcelingMode('manual')} className="accent-purple-600" />
+                  Divisão Manual
+                </label>
               </div>
+
+              {parcelingMode === 'forma' ? (
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Forma de Pagamento</label>
+                  <select value={selectedFormaId} onChange={e => setSelectedFormaId(e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                    <option value="">Selecione...</option>
+                    {formasPagamento.filter(f => f.ativo && f.parcelas.length > 0).map(f => (
+                      <option key={f.id} value={f.id}>{f.descricao} ({f.parcelas.length}x)</option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider mb-1.5">Número de Parcelas</label>
+                  <input type="number" min={2} max={60} value={numParcelas} onChange={e => setNumParcelas(parseInt(e.target.value) || 2)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono" />
+                </div>
+              )}
             </div>
             <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
               <button onClick={() => setParcelingTransId(null)} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-semibold">Cancelar</button>
-              <button onClick={() => { onParcelarTransaction(parcelingTransId, numParcelas); setParcelingTransId(null); showAlert("success", "Parcelamento Gerado", `O título foi dividido em ${numParcelas} parcelas.`); }} className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all">Confirmar Parcelamento</button>
+              <button onClick={() => { 
+                if (parcelingMode === 'forma' && !selectedFormaId) {
+                  showAlert("error", "Erro", "Selecione uma forma de pagamento.");
+                  return;
+                }
+                onParcelarTransaction(parcelingTransId, parcelingMode === 'forma' ? selectedFormaId : null, parcelingMode === 'manual' ? numParcelas : undefined); 
+                setParcelingTransId(null); 
+                showAlert("success", "Parcelamento Gerado", "O título foi parcelado com sucesso."); 
+              }} className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all">Confirmar Parcelamento</button>
             </div>
           </div>
         </div>

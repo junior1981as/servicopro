@@ -8,6 +8,15 @@ public class TenantEntity
     public string Nome { get; set; } = string.Empty;
     public string BancoDados { get; set; } = string.Empty;
     public bool Ativo { get; set; }
+    public string Documento { get; set; } = string.Empty;
+    public string RazaoSocial { get; set; } = string.Empty;
+    public string Telefone { get; set; } = string.Empty;
+    public string Cep { get; set; } = string.Empty;
+    public string Rua { get; set; } = string.Empty;
+    public string Numero { get; set; } = string.Empty;
+    public string Bairro { get; set; } = string.Empty;
+    public string Cidade { get; set; } = string.Empty;
+    public string Estado { get; set; } = string.Empty;
 }
 
 public class MasterDbContext : DbContext
@@ -39,6 +48,16 @@ public class MasterDbContext : DbContext
 
             entity.Property(e => e.Ativo)
                 .HasColumnName("ativo");
+
+            entity.Property(e => e.Documento).HasColumnName("documento");
+            entity.Property(e => e.RazaoSocial).HasColumnName("razao_social");
+            entity.Property(e => e.Telefone).HasColumnName("telefone");
+            entity.Property(e => e.Cep).HasColumnName("cep");
+            entity.Property(e => e.Rua).HasColumnName("rua");
+            entity.Property(e => e.Numero).HasColumnName("numero");
+            entity.Property(e => e.Bairro).HasColumnName("bairro");
+            entity.Property(e => e.Cidade).HasColumnName("cidade");
+            entity.Property(e => e.Estado).HasColumnName("estado");
         });
     }
 }

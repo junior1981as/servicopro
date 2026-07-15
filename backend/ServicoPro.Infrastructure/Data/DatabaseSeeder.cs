@@ -55,6 +55,20 @@ public static class DatabaseSeeder
                 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='usuarios' and xtype='U')
                     CREATE TABLE usuarios (id VARCHAR(50) PRIMARY KEY, nome VARCHAR(100), email VARCHAR(100), senha_hash VARCHAR(255), ativo BIT);
                 
+                IF COL_LENGTH('tenants', 'documento') IS NULL
+                BEGIN
+                    ALTER TABLE tenants ADD 
+                        documento NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        razao_social NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        telefone NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        cep NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        rua NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        numero NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        bairro NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        cidade NVARCHAR(MAX) DEFAULT '' NOT NULL,
+                        estado NVARCHAR(MAX) DEFAULT '' NOT NULL;
+                END
+
                 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='usuarios_tenants' and xtype='U')
                     CREATE TABLE usuarios_tenants (usuario_id VARCHAR(50), tenant_id VARCHAR(50), ativo BIT, PRIMARY KEY(usuario_id, tenant_id));
                 
@@ -155,6 +169,13 @@ public static class DatabaseSeeder
                     CREATE INDEX [IX_FormasPagamentoParcela_FormaPagamentoId] ON [dbo].[FormasPagamentoParcela] ([FormaPagamentoId]);
                 END";
             await tenantDb.Database.ExecuteSqlRawAsync(sqlForma);
+
+            var sqlAlterCliente = @"
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'FormaPagamentoPadraoId' AND Object_ID = Object_ID(N'Clientes'))
+                BEGIN
+                    ALTER TABLE Clientes ADD FormaPagamentoPadraoId uniqueidentifier NULL;
+                END";
+            await tenantDb.Database.ExecuteSqlRawAsync(sqlAlterCliente);
         } catch (Exception ex) {
             Console.WriteLine("ERRO AO ALTERAR TABELA FUNCIONARIOS: " + ex.Message);
         }

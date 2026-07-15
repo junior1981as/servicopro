@@ -36,6 +36,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => {
 .AddEntityFrameworkStores<ServicoProDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Information);
+
 // DI Configuration
 builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
@@ -76,6 +78,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     options.SerializerOptions.WriteIndented = false;
     options.SerializerOptions.PropertyNameCaseInsensitive = true;
+    options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
 
 builder.Services.AddCors(options =>

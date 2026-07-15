@@ -72,6 +72,12 @@ export default function Sidebar({
       label: "Central do Arquiteto",
       icon: Layers,
       description: "ADRs, Blueprints, Script MSSQL"
+    },
+    {
+      id: "settings",
+      label: "Usuários e Permissões",
+      icon: ShieldCheck,
+      description: "Acessos e Perfis do Sistema"
     }
   ];
 

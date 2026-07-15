@@ -19,6 +19,7 @@ public class Cliente
     public string? Rg { get; set; }
     public string? InscricaoEstadual { get; set; }
     public string TipoParceiro { get; set; } = "Cliente"; // Cliente, Fornecedor, Ambos
+    public Guid? FormaPagamentoPadraoId { get; set; }
     public bool Ativo { get; set; } = true;
     public DateTimeOffset CriadoEm { get; set; } = DateTimeOffset.UtcNow;
 }
@@ -105,7 +106,7 @@ public class FormaPagamentoParcela
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid FormaPagamentoId { get; set; }
-    public FormaPagamento FormaPagamento { get; set; } = null!;
+    public FormaPagamento? FormaPagamento { get; set; }
     
     public int NumeroParcela { get; set; }
     public int DiasVencimento { get; set; }

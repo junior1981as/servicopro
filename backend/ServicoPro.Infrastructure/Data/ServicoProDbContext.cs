@@ -60,8 +60,8 @@ public class ServicoProDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
         
-        builder.Entity<Cfop>().ToTable("CFOP", t => t.ExcludeFromMigrations());
-        builder.Entity<Ncm>().ToTable("NCM", t => t.ExcludeFromMigrations());
+        builder.Entity<Cfop>().ToTable("CFOP");
+        builder.Entity<Ncm>().ToTable("NCM");
         
         // Identity Columns
         builder.Entity<Cliente>().Property(c => c.Codigo).ValueGeneratedOnAdd();

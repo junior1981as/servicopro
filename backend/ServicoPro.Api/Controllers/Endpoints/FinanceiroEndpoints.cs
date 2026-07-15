@@ -113,7 +113,7 @@ public static class FinanceiroEndpoints
 
                 // 1. Atualiza a transação
                 transacao.Status = TransacaoStatus.Pago;
-                transacao.DataPagamento = DateTimeOffset.UtcNow;
+                transacao.DataPagamento = dto.PaymentDate ?? DateTimeOffset.UtcNow;
                 transacao.MetodoPagamento = dto.PaymentMethod;
                 transacao.ContaBancariaId = dto.ContaBancariaId;
 
@@ -130,7 +130,8 @@ public static class FinanceiroEndpoints
                     Valor = transacao.Valor,
                     Descricao = $"{(transacao.Tipo == TransacaoTipo.Receita ? "Entrada" : "Saída")} via {dto.PaymentMethod}: {transacao.Descricao}",
                     TransacaoId = transacao.Id,
-                    ContaBancariaId = dto.ContaBancariaId
+                    ContaBancariaId = dto.ContaBancariaId,
+                    DataHoraRegistro = dto.PaymentDate ?? DateTimeOffset.UtcNow
                 };
                 db.LivroCaixa.Add(livroCaixa);
 
@@ -230,30 +231,66 @@ public static class FinanceiroEndpoints
                 var t = await db.TransacoesFinanceiras.FindAsync(id);
                 if (t == null) return Results.NotFound();
                 if (t.Status == TransacaoStatus.Pago) return Results.BadRequest(new { error = "Não é possível parcelar uma transação já paga." });
-                if (dto.Parcelas < 2 || dto.Parcelas > 60) return Results.BadRequest(new { error = "O número de parcelas deve ser entre 2 e 60." });
-
-                var valorParcela = Math.Round(t.Valor / dto.Parcelas, 2);
-                var diff = t.Valor - (valorParcela * dto.Parcelas);
-
-                var baseVencimento = t.DataVencimento;
-
-                for (int i = 1; i <= dto.Parcelas; i++)
+                if (dto.FormaPagamentoId.HasValue && dto.FormaPagamentoId.Value != Guid.Empty)
                 {
-                    var p = new TransacaoFinanceira
+                    var forma = await db.FormasPagamento.Include(f => f.Parcelas).FirstOrDefaultAsync(f => f.Id == dto.FormaPagamentoId.Value);
+                    if (forma == null) return Results.BadRequest(new { error = "Forma de pagamento não encontrada." });
+                    if (!forma.Parcelas.Any()) return Results.BadRequest(new { error = "Forma de pagamento não possui parcelas configuradas." });
+
+                    var parcelasOrder = forma.Parcelas.OrderBy(p => p.NumeroParcela).ToList();
+                    decimal valorDistribuido = 0;
+
+                    for (int i = 0; i < parcelasOrder.Count; i++) {
+                        var p = parcelasOrder[i];
+                        decimal valorParcela = Math.Round(t.Valor * (p.PorcentagemValor / 100m), 2);
+                        if (i == parcelasOrder.Count - 1) { // last parcel adjusts precision
+                            valorParcela = t.Valor - valorDistribuido;
+                        }
+                        valorDistribuido += valorParcela;
+
+                        var novaTransacao = new TransacaoFinanceira {
+                            Tipo = t.Tipo,
+                            Categoria = t.Categoria,
+                            OrdemServicoId = t.OrdemServicoId,
+                            CompraId = t.CompraId,
+                            Descricao = $"{t.Descricao} - Parcela {i+1}/{parcelasOrder.Count} ({forma.Descricao})",
+                            Valor = valorParcela,
+                            Desconto = i == 0 ? t.Desconto : 0,
+                            DataVencimento = t.DataVencimento.AddDays(p.DiasVencimento),
+                            NumeroParcela = i + 1,
+                            TotalParcelas = parcelasOrder.Count,
+                            Status = TransacaoStatus.Pendente
+                        };
+                        db.TransacoesFinanceiras.Add(novaTransacao);
+                    }
+                }
+                else
+                {
+                    if (!dto.Parcelas.HasValue || dto.Parcelas < 2 || dto.Parcelas > 60) return Results.BadRequest(new { error = "O número de parcelas deve ser entre 2 e 60." });
+
+                    var valorParcela = Math.Round(t.Valor / dto.Parcelas.Value, 2);
+                    var diff = t.Valor - (valorParcela * dto.Parcelas.Value);
+
+                    var baseVencimento = t.DataVencimento;
+
+                    for (int i = 1; i <= dto.Parcelas.Value; i++)
                     {
-                        Tipo = t.Tipo,
-                        Categoria = t.Categoria,
-                        OrdemServicoId = t.OrdemServicoId,
-                        CompraId = t.CompraId,
-                        Descricao = $"{t.Descricao} - Parcela {i}/{dto.Parcelas}",
-                        Valor = i == dto.Parcelas ? valorParcela + diff : valorParcela,
-                        Desconto = i == 1 ? t.Desconto : 0, // Aplica desconto existente na primeira parcela
-                        DataVencimento = baseVencimento.AddMonths(i - 1),
-                        NumeroParcela = i,
-                        TotalParcelas = dto.Parcelas,
-                        Status = TransacaoStatus.Pendente
-                    };
-                    db.TransacoesFinanceiras.Add(p);
+                        var p = new TransacaoFinanceira
+                        {
+                            Tipo = t.Tipo,
+                            Categoria = t.Categoria,
+                            OrdemServicoId = t.OrdemServicoId,
+                            CompraId = t.CompraId,
+                            Descricao = $"{t.Descricao} - Parcela {i}/{dto.Parcelas.Value}",
+                            Valor = i == dto.Parcelas.Value ? valorParcela + diff : valorParcela,
+                            Desconto = i == 1 ? t.Desconto : 0, 
+                            DataVencimento = baseVencimento.AddMonths(i - 1),
+                            NumeroParcela = i,
+                            TotalParcelas = dto.Parcelas.Value,
+                            Status = TransacaoStatus.Pendente
+                        };
+                        db.TransacoesFinanceiras.Add(p);
+                    }
                 }
 
                 // Cancela a original em vez de deletar para preservar histórico do Livro Caixa
@@ -389,6 +426,7 @@ public class PayTransactionDto
 {
     public string PaymentMethod { get; set; } = string.Empty;
     public Guid ContaBancariaId { get; set; }
+    public DateTimeOffset? PaymentDate { get; set; }
 }
 
 public class CreateContaDto
@@ -422,5 +460,6 @@ public class EditTransactionDto
 
 public class ParcelarTransactionDto
 {
-    public int Parcelas { get; set; }
+    public Guid? FormaPagamentoId { get; set; }
+    public int? Parcelas { get; set; }
 }

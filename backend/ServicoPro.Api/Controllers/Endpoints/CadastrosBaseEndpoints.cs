@@ -278,5 +278,77 @@ public static class CadastrosBaseEndpoints
 
         group.MapGet("/ncms", async (ServicoProDbContext db) =>
             Results.Ok(await db.Ncms.OrderBy(n => n.Codigo).ToListAsync()));
+
+        // --- FORMAS DE PAGAMENTO ---
+        group.MapGet("/formaspagamento", async (ServicoProDbContext db) =>
+        {
+            return Results.Ok(await db.FormasPagamento.Include(f => f.Parcelas).ToListAsync());
+        });
+
+        group.MapPost("/formaspagamento", async (FormaPagamento forma, ServicoProDbContext db) =>
+        {
+            db.FormasPagamento.Add(forma);
+            await db.SaveChangesAsync();
+            return Results.Created($"/api/cadastros/formaspagamento/{forma.Id}", forma);
+        });
+
+        group.MapPut("/formaspagamento/{id:guid}", async (Guid id, FormaPagamento atualizada, ServicoProDbContext db) =>
+        {
+            using var tx = await db.Database.BeginTransactionAsync();
+            try {
+                var forma = await db.FormasPagamento.Include(f => f.Parcelas).FirstOrDefaultAsync(f => f.Id == id);
+                if (forma == null) return Results.NotFound();
+                
+                forma.Codigo = atualizada.Codigo;
+                forma.Descricao = atualizada.Descricao;
+                forma.Ativo = atualizada.Ativo;
+
+                Console.WriteLine($"Forma in DB has {forma.Parcelas.Count} parcelas. Incoming has {atualizada.Parcelas.Count} parcelas.");
+                // Sync Parcelas
+                var incomingParcelasIds = atualizada.Parcelas.Select(p => p.Id).ToList();
+                var toRemove = forma.Parcelas.Where(p => !incomingParcelasIds.Contains(p.Id)).ToList();
+                
+                Console.WriteLine($"Removing {toRemove.Count} parcelas.");
+                db.FormasPagamentoParcela.RemoveRange(toRemove);
+                
+                foreach (var p in atualizada.Parcelas) {
+                    var existing = forma.Parcelas.FirstOrDefault(ep => ep.Id == p.Id && p.Id != Guid.Empty);
+                    if (existing != null) {
+                        Console.WriteLine($"Updating existing parcela {existing.Id}");
+                        existing.NumeroParcela = p.NumeroParcela;
+                        existing.DiasVencimento = p.DiasVencimento;
+                        existing.PorcentagemValor = p.PorcentagemValor;
+                        existing.TaxaOuDesconto = p.TaxaOuDesconto;
+                    } else {
+                        Console.WriteLine($"Adding new parcela (incoming Id was {p.Id})");
+                        var novaParcela = new FormaPagamentoParcela {
+                            NumeroParcela = p.NumeroParcela,
+                            DiasVencimento = p.DiasVencimento,
+                            PorcentagemValor = p.PorcentagemValor,
+                            TaxaOuDesconto = p.TaxaOuDesconto,
+                            FormaPagamentoId = forma.Id
+                        };
+                        db.Entry(novaParcela).State = EntityState.Added;
+                    }
+                }
+
+                await db.SaveChangesAsync();
+                await tx.CommitAsync();
+                return Results.Ok(forma);
+            } catch (Exception ex) {
+                await tx.RollbackAsync();
+                return Results.BadRequest("ERRO NA API: " + ex.ToString());
+            }
+        }).RequireAuthorization(); // I will change it back later if needed, but wait! MapPut returns IEndpointConventionBuilder so we can chain AllowAnonymous.
+
+        group.MapDelete("/formaspagamento/{id:guid}", async (Guid id, ServicoProDbContext db) =>
+        {
+            var forma = await db.FormasPagamento.FindAsync(id);
+            if (forma == null) return Results.NotFound();
+            
+            db.FormasPagamento.Remove(forma);
+            await db.SaveChangesAsync();
+            return Results.Ok();
+        });
     }
 }

@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Client, Asset, Product, Service, WorkOrder, Budget, Purchase, Employee, ProductHistoryEntry } from "../types";
+import { Client, Asset, Product, Service, WorkOrder, Budget, Purchase, Employee, ProductHistoryEntry, FormaPagamento, FormaPagamentoParcela } from "../types";
 import { Users, Laptop, HardDrive, Settings, Plus, Search, FileText, Check, Trash2, Tag, Percent, Edit, Clock, X, Wrench, PackageSearch, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { api } from "../services/api";
 
@@ -33,6 +33,10 @@ interface RegistersTabProps {
   onUpdateService?: (service: Service) => void;
   onUpdateEmployee?: (employee: Employee) => void;
   onUpdateContaBancaria?: (id: string, data: any) => void;
+  formasPagamento?: FormaPagamento[];
+  onAddFormaPagamento?: (fp: Partial<FormaPagamento>) => void;
+  onUpdateFormaPagamento?: (fp: FormaPagamento) => void;
+  onDeleteFormaPagamento?: (id: string) => void;
   workOrders?: WorkOrder[];
   budgets?: Budget[];
   purchases?: Purchase[];
@@ -64,6 +68,10 @@ export default function RegistersTab({
   onUpdateService,
   onUpdateEmployee,
   onUpdateContaBancaria,
+  formasPagamento = [],
+  onAddFormaPagamento,
+  onUpdateFormaPagamento,
+  onDeleteFormaPagamento,
   workOrders = [],
   budgets = [],
   purchases = [],
@@ -90,6 +98,7 @@ export default function RegistersTab({
   const [clientRg, setClientRg] = useState("");
   const [clientIe, setClientIe] = useState("");
   const [clientPartnerType, setClientPartnerType] = useState<"Cliente" | "Fornecedor" | "Ambos">("Cliente");
+  const [clientFormaPagamentoId, setClientFormaPagamentoId] = useState<string>("");
   const [clientIsActive, setClientIsActive] = useState(true);
   const [clientPhone, setClientPhone] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -326,6 +335,13 @@ export default function RegistersTab({
   const [contaAtivo, setContaAtivo] = useState(true);
   const [editingContaId, setEditingContaId] = useState<string | null>(null);
 
+  // Forma Pagamento Form
+  const [formaCodigo, setFormaCodigo] = useState("");
+  const [formaDescricao, setFormaDescricao] = useState("");
+  const [formaAtivo, setFormaAtivo] = useState(true);
+  const [formaParcelas, setFormaParcelas] = useState<FormaPagamentoParcela[]>([]);
+  const [editingFormaId, setEditingFormaId] = useState<string | null>(null);
+
   // Filter lists by search query (already filtered by tenant in parent, but double safe check)
   const filteredClients = clients.filter(c => 
     c.tenantId === tenantId &&
@@ -363,6 +379,7 @@ export default function RegistersTab({
       rg: clientRg,
       ie: clientIe,
       partnerType: clientPartnerType,
+      formaPagamentoPadraoId: clientFormaPagamentoId || undefined,
       isActive: clientIsActive,
       phone: clientPhone,
       email: clientEmail,
@@ -384,6 +401,7 @@ export default function RegistersTab({
     setShowForm(false);
     // Reset
     setClientName(""); setClientDoc(""); setClientRg(""); setClientIe(""); setClientPartnerType("Cliente"); setClientIsActive(true); setClientPhone(""); setClientEmail(""); 
+    setClientFormaPagamentoId("");
     setClientCep(""); setClientRua(""); setClientNumero(""); setClientBairro(""); setClientCidade(""); setClientEstado(""); setEditingClientId(null);
   };
 
@@ -393,6 +411,7 @@ export default function RegistersTab({
     setClientRg(c.rg || "");
     setClientIe(c.ie || "");
     setClientPartnerType(c.partnerType || "Cliente");
+    setClientFormaPagamentoId(c.formaPagamentoPadraoId || "");
     setClientIsActive(c.isActive !== undefined ? c.isActive : true);
     setClientPhone(formatPhoneStr(c.phone));
     setClientEmail(c.email);
@@ -620,6 +639,43 @@ export default function RegistersTab({
     c.nome.toLowerCase().includes(search.toLowerCase()) || (c.banco && c.banco.toLowerCase().includes(search.toLowerCase()))
   );
 
+  const handleSaveFormaPagamento = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formaCodigo || !formaDescricao) return;
+
+    const fp = {
+      id: editingFormaId || undefined,
+      tenantId,
+      codigo: formaCodigo,
+      descricao: formaDescricao,
+      ativo: formaAtivo,
+      parcelas: formaParcelas
+    };
+
+    if (editingFormaId && onUpdateFormaPagamento) {
+      onUpdateFormaPagamento(fp as FormaPagamento);
+    } else if (onAddFormaPagamento) {
+      onAddFormaPagamento(fp);
+    }
+
+    setShowForm(false);
+    setFormaCodigo(""); setFormaDescricao(""); setFormaAtivo(true); setFormaParcelas([]); setEditingFormaId(null);
+  };
+
+  const handleEditFormaPagamento = (fp: FormaPagamento) => {
+    setFormaCodigo(fp.codigo);
+    setFormaDescricao(fp.descricao);
+    setFormaAtivo(fp.ativo);
+    setFormaParcelas(fp.parcelas || []);
+    setEditingFormaId(fp.id);
+    setSubTab("formasPagamento");
+    setShowForm(true);
+  };
+
+  const filteredFormas = formasPagamento.filter(f =>
+    f.descricao.toLowerCase().includes(search.toLowerCase()) || f.codigo.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="space-y-6" id="registers_tab_content">
       {/* Registers Sub-Tabs */}
@@ -685,6 +741,15 @@ export default function RegistersTab({
             <div className="w-3.5 h-3.5 bg-slate-500 rounded-sm"></div>
             Contas Bancárias ({contasBancarias.length})
           </button>
+          <button
+            onClick={() => { setSubTab("formasPagamento"); setSearch(""); setShowForm(false); }}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-semibold font-sans transition-all ${
+              subTab === "formasPagamento" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <Percent className="w-3.5 h-3.5 text-slate-500" />
+            Formas Pagamento ({formasPagamento.length})
+          </button>
         </div>
 
         <button
@@ -697,7 +762,7 @@ export default function RegistersTab({
               setEditingServiceId(null);
               setEditingEmployeeId(null);
               setEditingContaId(null);
-              setClientName(""); setClientDoc(""); setClientRg(""); setClientIe(""); setClientPartnerType("Cliente"); setClientIsActive(true); setClientPhone(""); setClientEmail(""); setClientCep(""); setClientRua(""); setClientNumero(""); setClientBairro(""); setClientCidade(""); setClientEstado("");
+              setClientName(""); setClientDoc(""); setClientRg(""); setClientIe(""); setClientPartnerType("Cliente"); setClientFormaPagamentoId(""); setClientIsActive(true); setClientPhone(""); setClientEmail(""); setClientCep(""); setClientRua(""); setClientNumero(""); setClientBairro(""); setClientCidade(""); setClientEstado("");
               setAssetName(""); setAssetBrand(""); setAssetModel(""); setAssetSerial(""); setAssetClientId(""); setAssetNotes("");
               setProdSku(""); setProdName(""); setProdCost(0); setProdPrice(0); setProdMin(1); setProdStock(1); setProdUnit("UN");
               setServName(""); setServCost(0); setServPrice(0); setServDuration(1.0);
@@ -734,8 +799,8 @@ export default function RegistersTab({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-sans font-semibold text-slate-900 flex items-center gap-2">
               <span className="w-1.5 h-4 bg-slate-900 rounded-full inline-block"></span>
-              {(editingClientId || editingAssetId || editingProductId || editingServiceId || editingEmployeeId || editingContaId) ? "Editar " : "Cadastrar Novo "} 
-              {subTab === "clients" ? "Cliente / Fornecedor" : subTab === "assets" ? "Ativo" : subTab === "products" ? "Produto" : subTab === "services" ? "Serviço" : subTab === "employees" ? "Técnico" : "Conta Bancária"}
+              {(editingClientId || editingAssetId || editingProductId || editingServiceId || editingEmployeeId || editingContaId || editingFormaId) ? "Editar " : "Cadastrar Novo "} 
+              {subTab === "clients" ? "Cliente / Fornecedor" : subTab === "assets" ? "Ativo" : subTab === "products" ? "Produto" : subTab === "services" ? "Serviço" : subTab === "employees" ? "Técnico" : subTab === "formaspagamento" ? "Forma de Pagamento" : "Conta Bancária"}
             </h3>
             <div className="flex items-center gap-2">
               <button
@@ -794,6 +859,15 @@ export default function RegistersTab({
                     <option value="Cliente">Cliente</option>
                     <option value="Fornecedor">Fornecedor</option>
                     <option value="Ambos">Ambos</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Forma de Pgto. Padrão</label>
+                  <select value={clientFormaPagamentoId} onChange={e=>setClientFormaPagamentoId(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs">
+                    <option value="">-- Nenhuma --</option>
+                    {formasPagamento.filter(f => f.ativo).map(fp => (
+                      <option key={fp.id} value={fp.id}>{fp.descricao}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="flex items-center gap-2 mt-6">
@@ -1094,6 +1168,73 @@ export default function RegistersTab({
                 <button type="button" onClick={()=>{setShowForm(false); setEditingContaId(null);}} className="px-4 py-2 border border-slate-200 rounded text-xs font-semibold bg-white text-slate-700">Cancelar</button>
                 <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded text-xs font-semibold">
                   {editingContaId ? "Salvar Alterações" : "Salvar Conta"}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* FORMA PAGAMENTO FORM */}
+          {subTab === "formasPagamento" && (
+            <form onSubmit={handleSaveFormaPagamento} onKeyDown={handleEnterAsTab} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-1">
+                  <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Código *</label>
+                  <input required type="text" placeholder="ex: 01" value={formaCodigo} onChange={e=>setFormaCodigo(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+                </div>
+                <div className="md:col-span-3">
+                  <label className="block text-[10px] font-mono uppercase text-slate-500 mb-1">Descrição *</label>
+                  <input required type="text" placeholder="ex: Boleto 30/60/90 Dias" value={formaDescricao} onChange={e=>setFormaDescricao(e.target.value)} className="w-full p-2.5 bg-white border border-slate-200 rounded text-xs" />
+                </div>
+              </div>
+              
+              {/* Parcelas */}
+              <div className="mt-4 border border-slate-200 rounded-lg p-4 bg-slate-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-sm font-semibold text-slate-700">Parcelas</h4>
+                  <button type="button" onClick={() => setFormaParcelas([...formaParcelas, { numeroParcela: formaParcelas.length + 1, diasVencimento: 30, porcentagemValor: 0, taxaOuDesconto: 0 }])} className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded text-xs font-semibold hover:bg-indigo-100">
+                    <Plus className="w-3.5 h-3.5" /> Adicionar Parcela
+                  </button>
+                </div>
+                {formaParcelas.length === 0 ? (
+                  <p className="text-xs text-slate-500 italic">Nenhuma parcela adicionada. Se não houver parcelas, a forma será considerada "À Vista".</p>
+                ) : (
+                  <div className="space-y-2">
+                    {formaParcelas.map((p, idx) => (
+                      <div key={idx} className="flex flex-wrap md:flex-nowrap items-center gap-3 bg-white p-3 border border-slate-200 rounded">
+                        <div className="w-16">
+                          <label className="block text-[10px] font-mono text-slate-400">Nº Parc.</label>
+                          <input type="number" value={p.numeroParcela} onChange={e => { const newP = [...formaParcelas]; newP[idx].numeroParcela = Number(e.target.value); setFormaParcelas(newP); }} className="w-full text-center p-1.5 text-xs border border-slate-200 rounded" />
+                        </div>
+                        <div className="w-24">
+                          <label className="block text-[10px] font-mono text-slate-400">Dias Venc.</label>
+                          <input type="number" value={p.diasVencimento} onChange={e => { const newP = [...formaParcelas]; newP[idx].diasVencimento = Number(e.target.value); setFormaParcelas(newP); }} className="w-full text-center p-1.5 text-xs border border-slate-200 rounded" />
+                        </div>
+                        <div className="w-28">
+                          <label className="block text-[10px] font-mono text-slate-400">% do Valor Total</label>
+                          <input type="number" step="0.01" value={p.porcentagemValor} onChange={e => { const newP = [...formaParcelas]; newP[idx].porcentagemValor = Number(e.target.value); setFormaParcelas(newP); }} className="w-full text-center p-1.5 text-xs border border-slate-200 rounded" />
+                        </div>
+                        <div className="w-28">
+                          <label className="block text-[10px] font-mono text-slate-400">Taxa/Desc (%)</label>
+                          <input type="number" step="0.01" value={p.taxaOuDesconto} onChange={e => { const newP = [...formaParcelas]; newP[idx].taxaOuDesconto = Number(e.target.value); setFormaParcelas(newP); }} className="w-full text-center p-1.5 text-xs border border-slate-200 rounded" />
+                        </div>
+                        <button type="button" onClick={() => setFormaParcelas(formaParcelas.filter((_, i) => i !== idx))} className="ml-auto p-1.5 text-rose-500 hover:bg-rose-50 rounded">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 mt-2">
+                <input type="checkbox" id="formaAtivo" checked={formaAtivo} onChange={e=>setFormaAtivo(e.target.checked)} className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-600" />
+                <label htmlFor="formaAtivo" className="text-sm font-semibold text-slate-700">Forma Ativa / Inativa</label>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200 flex justify-end gap-2">
+                <button type="button" onClick={()=>{setShowForm(false); setEditingFormaId(null);}} className="px-4 py-2 border border-slate-200 rounded text-xs font-semibold bg-white text-slate-700">Cancelar</button>
+                <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded text-xs font-semibold">
+                  {editingFormaId ? "Salvar Alterações" : "Salvar Forma"}
                 </button>
               </div>
             </form>
@@ -1482,6 +1623,78 @@ export default function RegistersTab({
                   <tr>
                     <td colSpan={5} className="px-4 py-12 text-center text-slate-400">
                       Nenhuma conta bancária registrada ainda.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* FORMAS PAGAMENTO LIST */}
+      {!showForm && subTab === "formasPagamento" && (
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm animate-fade-in">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs whitespace-nowrap">
+              <thead className="bg-slate-50 font-mono text-[10px] text-slate-500 uppercase">
+                <tr>
+                  <th className="px-4 py-3 border-b border-slate-200 w-24">Código</th>
+                  <th className="px-4 py-3 border-b border-slate-200">Descrição</th>
+                  <th className="px-4 py-3 border-b border-slate-200 text-center">Parcelas</th>
+                  <th className="px-4 py-3 border-b border-slate-200 text-center">Status</th>
+                  <th className="px-4 py-3 border-b border-slate-200 w-16">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredFormas.map((f) => (
+                  <tr key={f.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3 font-mono font-medium text-slate-600">{f.codigo}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-800">{f.descricao}</td>
+                    <td className="px-4 py-3 text-center">
+                      {f.parcelas && f.parcelas.length > 0 ? (
+                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full font-semibold text-[10px]">
+                          {f.parcelas.length}x
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full font-semibold text-[10px]">
+                          À Vista
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${f.ativo !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                        {f.ativo !== false ? "ATIVO" : "INATIVO"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditFormaPagamento(f)}
+                          className="p-1 text-slate-400 hover:text-indigo-600 transition-colors inline-block"
+                          title="Editar"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if(window.confirm("Deseja excluir esta forma de pagamento?")) {
+                              onDeleteFormaPagamento?.(f.id);
+                            }
+                          }}
+                          className="p-1 text-slate-400 hover:text-rose-600 transition-colors inline-block"
+                          title="Excluir"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredFormas.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-12 text-center text-slate-400">
+                      Nenhuma forma de pagamento registrada ainda.
                     </td>
                   </tr>
                 )}

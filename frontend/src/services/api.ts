@@ -1,4 +1,4 @@
-import { Client, Product, Service, Asset, Schedule, Budget, WorkOrder, Purchase, FinancialTransaction, CashLedger, Employee, ProductHistoryEntry } from '../types';
+import { Client, Product, Service, Asset, Schedule, Budget, WorkOrder, Purchase, FinancialTransaction, CashLedger, Employee, ProductHistoryEntry, FormaPagamento, FormaPagamentoParcela } from '../types';
 
 const API_BASE_URL = '/api';
 
@@ -11,7 +11,7 @@ class ApiService {
     };
   }
 
-  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  public async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
@@ -29,11 +29,22 @@ class ApiService {
     if (!response.ok) {
       let errorMessage = `API Error: ${response.statusText}`;
       try {
-        const errData = await response.json();
-        if (errData && (errData.error || errData.message)) {
-          errorMessage = errData.error || errData.message;
-          if (errData.details) {
-            errorMessage += `\n\nDetalhes: ${errData.details}`;
+        const textData = await response.text();
+        if (textData) {
+          try {
+            const errData = JSON.parse(textData);
+            if (errData && (errData.error || errData.message)) {
+              errorMessage = errData.error || errData.message;
+              if (errData.details) {
+                errorMessage += `\n\nDetalhes: ${errData.details}`;
+              }
+            } else if (errData && errData.title) {
+              errorMessage = errData.title; // For ProblemDetails
+            } else if (typeof errData === 'string') {
+              errorMessage = errData;
+            }
+          } catch (e) {
+            errorMessage = textData;
           }
         }
       } catch (e) {}
@@ -77,6 +88,7 @@ class ApiService {
       rg: c.rg || '',
       ie: c.inscricaoEstadual || '',
       partnerType: c.tipoParceiro || 'Cliente',
+      formaPagamentoPadraoId: c.formaPagamentoPadraoId,
       isActive: c.ativo !== undefined ? c.ativo : true,
       createdAt: c.criadoEm || new Date().toISOString()
     }));
@@ -183,7 +195,8 @@ class ApiService {
       estado: clientData.estado,
       rg: clientData.rg,
       inscricaoEstadual: clientData.ie,
-      tipoParceiro: clientData.partnerType || 'Cliente'
+      tipoParceiro: clientData.partnerType || 'Cliente',
+      formaPagamentoPadraoId: clientData.formaPagamentoPadraoId
     };
     return this.request<any>('/cadastros/clientes', {
       method: 'POST',
@@ -274,7 +287,8 @@ class ApiService {
       estado: clientData.estado,
       rg: clientData.rg,
       inscricaoEstadual: clientData.ie,
-      tipoParceiro: clientData.partnerType || 'Cliente'
+      tipoParceiro: clientData.partnerType || 'Cliente',
+      formaPagamentoPadraoId: clientData.formaPagamentoPadraoId
     };
     await this.request(`/cadastros/clientes/${clientData.id}`, {
       method: 'PUT',
@@ -299,6 +313,63 @@ class ApiService {
     await this.request(`/cadastros/funcionarios/${employeeData.id}`, {
       method: 'PUT',
       body: JSON.stringify(payload)
+    });
+  }
+
+  // --- Formas de Pagamento ---
+
+  async getFormasPagamento(): Promise<FormaPagamento[]> {
+    const data = await this.request<any[]>('/cadastros/formaspagamento');
+    const tid = this.getActiveTenantId();
+    return data.map(f => ({
+      id: f.id,
+      tenantId: tid,
+      codigo: f.codigo,
+      descricao: f.descricao,
+      ativo: f.ativo,
+      parcelas: (f.parcelas || []).map((p: any) => ({
+        id: p.id,
+        formaPagamentoId: p.formaPagamentoId,
+        numeroParcela: p.numeroParcela,
+        diasVencimento: p.diasVencimento,
+        porcentagemValor: p.porcentagemValor,
+        taxaOuDesconto: p.taxaOuDesconto
+      }))
+    }));
+  }
+
+  async createFormaPagamento(forma: Partial<FormaPagamento>): Promise<FormaPagamento> {
+    const payload = {
+      tenantId: this.getActiveTenantId(),
+      codigo: forma.codigo,
+      descricao: forma.descricao,
+      ativo: forma.ativo ?? true,
+      parcelas: forma.parcelas || []
+    };
+    return this.request<any>('/cadastros/formaspagamento', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async updateFormaPagamento(forma: FormaPagamento): Promise<void> {
+    const payload = {
+      id: forma.id,
+      tenantId: forma.tenantId || this.getActiveTenantId(),
+      codigo: forma.codigo,
+      descricao: forma.descricao,
+      ativo: forma.ativo,
+      parcelas: forma.parcelas || []
+    };
+    await this.request(`/cadastros/formaspagamento/${forma.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async deleteFormaPagamento(id: string): Promise<void> {
+    await this.request(`/cadastros/formaspagamento/${id}`, {
+      method: 'DELETE'
     });
   }
 
@@ -563,10 +634,10 @@ class ApiService {
     });
   }
 
-  async payTransaction(id: string, paymentMethod: string, contaBancariaId: string): Promise<void> {
+  async payTransaction(id: string, paymentMethod: string, contaBancariaId: string, paymentDate?: string): Promise<void> {
     await this.request(`/financeiro/transacoes/${id}/pagar`, {
       method: 'POST',
-      body: JSON.stringify({ paymentMethod, contaBancariaId })
+      body: JSON.stringify({ paymentMethod, contaBancariaId, paymentDate })
     });
   }
 
@@ -577,10 +648,10 @@ class ApiService {
     });
   }
 
-  async parcelarTransaction(id: string, parcelas: number): Promise<void> {
+  async parcelarTransaction(id: string, formaPagamentoId: string | null, parcelas?: number): Promise<void> {
     await this.request(`/financeiro/transacoes/${id}/parcelar`, {
       method: 'POST',
-      body: JSON.stringify({ parcelas })
+      body: JSON.stringify({ formaPagamentoId, parcelas })
     });
   }
 
@@ -603,6 +674,47 @@ class ApiService {
       ...c,
       tenantId: tid
     }));
+  }
+
+  // --- Admin / SaaS ---
+  async getSaaSTenants(): Promise<any[]> {
+    return await this.request<any[]>('/admin/tenants');
+  }
+
+  async provisionSaaSTenant(data: { 
+    nomeCliente: string, 
+    razaoSocial?: string,
+    documento?: string,
+    telefone?: string,
+    cep?: string,
+    rua?: string,
+    numero?: string,
+    bairro?: string,
+    cidade?: string,
+    estado?: string,
+    inscricaoEstadual?: string,
+    valorMensalidade?: number,
+    nomeBanco: string, 
+    adminEmail: string, 
+    adminSenha: string 
+  }): Promise<any> {
+    return await this.request<any>('/admin/tenants/provisionar', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async updateSaaSTenant(id: string, data: any): Promise<void> {
+    await this.request(`/admin/tenants/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async deleteSaaSTenant(id: string): Promise<void> {
+    await this.request(`/admin/tenants/${id}`, {
+      method: 'DELETE'
+    });
   }
 }
 
